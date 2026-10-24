@@ -116,7 +116,12 @@ const W = {"window":{"from":1788220800000,"to":1792872234609,"days":54},"chat":{
 const S = W.stats;
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const P = (id) => W.people[id] ?? { name: 'someone', handle: null, avatar: null };
+// Names shown differently from their server nickname, at the owner's request.
+const NAME_OVERRIDES = { '1531401125826138173': 'Batata' };
+const P = (id) => {
+  const p = W.people[id] ?? { name: 'someone', handle: null, avatar: null };
+  return NAME_OVERRIDES[id] ? { ...p, name: NAME_OVERRIDES[id] } : p;
+};
 const hrs = (min) => fmt(min / 60);
 const day = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 const plural = (n, one, many = one + 's') => `${fmt(n)} ${n === 1 ? one : many}`;
@@ -272,7 +277,6 @@ html += band('chaos', 'c-chaos', 'Chapter 8', 'Chaos', `Heists, jail time, and t
   ${award('Most time in jail', S.jail.top, (w) => `<b>${fmt(w.v / 60)}</b> hours behind bars.`, (x) => `${fmt(x.v / 60)} h`)}
   ${award('Fined for Arabic', S.arabicFee.top, (w) => `Paid <b>${fmt(w.v)}</b> pebbles in Arabic-letter fees.`, (x) => fmt(x.v))}
   ${S.poker.biggestPot ? award('Biggest poker pot', [{ id: S.poker.biggestPot.id }], () => `Walked away from a table with <b>${fmt(S.poker.biggestPot.v)}</b> pebbles.`, () => '') : ''}
-  ${S.museum ? `<article class="award"><span class="label">Taco's Museum</span><p class="stat"><b>${fmt(S.museum)}</b> exhibits hung so far. The collection grows.</p></article>` : ''}
   </div>`);
 
 /* ---- outro ---- */
