@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Secret Lair Wrapped</title>
+<meta name="description" content="The Secret Lair's last 50 days on Discord: who talked, who tagged who, who lived in VC, and everything Pebble saw.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a vertical stack of full-width colour bands, one per chapter (chat, voice, pebbles, casino, drops, cards, rivalries, chaos), each a big headline then a wrapping grid of award cards. One deliberate look: dark, saturated duotone fields — no light theme on purpose. */
+:root {
+  color-scheme: dark;
+  --ink: #fbf8ff;
+  --ink-2: rgba(251, 248, 255, 0.78);
+  --ink-3: rgba(251, 248, 255, 0.56);
+  --base: #0b0a10;
+  --card: rgba(255, 255, 255, 0.07);
+  --card-line: rgba(255, 255, 255, 0.14);
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--base); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+.band { --bg: #2b0b52; --hot: #ff4fd8; --cool: #6d3bff; position: relative; overflow: hidden; background: var(--bg); }
+.band::before { content: ""; position: absolute; inset: -20% -10%; background:
+  radial-gradient(40% 50% at 85% 10%, color-mix(in oklab, var(--hot) 55%, transparent), transparent 70%),
+  radial-gradient(45% 55% at 5% 95%, color-mix(in oklab, var(--cool) 60%, transparent), transparent 70%); pointer-events: none; }
+.inner { position: relative; max-width: 1180px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); padding-block: 72px 80px; display: grid; gap: 34px; }
+.kicker { font: 700 12px/1 var(--display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--hot); }
+h1, h2, h3 { margin: 0; font-family: var(--display); text-wrap: balance; }
+h1 { font-size: clamp(40px, 9vw, 112px); font-weight: 900; line-height: 0.95; letter-spacing: -0.03em; }
+h2 { font-size: clamp(30px, 5.4vw, 64px); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+.lead { font-size: clamp(17px, 2vw, 21px); color: var(--ink-2); max-width: 60ch; margin: 0; }
+.head { display: grid; gap: 14px; }
+
+.big { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 26px 34px; }
+.big .n { font: 900 clamp(34px, 4.4vw, 56px)/1 var(--display); overflow-wrap: anywhere; letter-spacing: -0.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.big .k { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
+.big > div { border-top: 3px solid var(--hot); padding-top: 14px; min-width: 0; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 18px; align-items: start; }
+.award { background: var(--card); border: 1px solid var(--card-line); border-radius: 22px; padding: 22px; display: grid; gap: 14px; min-width: 0; backdrop-filter: blur(6px); }
+.award.wide { grid-column: 1 / -1; }
+.award .label { font: 700 12px/1.2 var(--display); text-transform: uppercase; letter-spacing: 0.12em; color: var(--hot); }
+.winner { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.winner .who { min-width: 0; display: grid; gap: 2px; }
+.winner .name { font: 700 clamp(17px, 1.8vw, 21px)/1.15 var(--display); overflow-wrap: anywhere; }
+.winner .duo + .who .name { font-size: clamp(15px, 1.5vw, 18px); }
+.winner .handle { font-size: 13px; color: var(--ink-3); overflow-wrap: anywhere; }
+.stat { font-size: 17px; color: var(--ink); margin: 0; }
+.stat b { font-family: var(--display); font-weight: 700; }
+.note { font-size: 14px; color: var(--ink-2); margin: 0; }
+.av { width: 64px; height: 64px; border-radius: 50%; flex: none; object-fit: cover; background: color-mix(in oklab, var(--hot) 40%, var(--bg)); display: grid; place-items: center; font: 700 24px/1 var(--display); color: var(--ink); box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--hot); }
+.av.sm { width: 26px; height: 26px; font-size: 11px; box-shadow: none; }
+.duo { display: flex; flex: none; }
+.duo .av + .av { margin-left: -18px; }
+.runners { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--card-line); display: grid; gap: 8px; }
+.runners li { display: grid; grid-template-columns: 20px 26px 1fr auto; align-items: center; gap: 10px; font-size: 14.5px; color: var(--ink-2); }
+.runners li .rk { font: 700 12px var(--display); color: var(--ink-3); }
+.runners li .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.runners li .v { font-variant-numeric: tabular-nums; }
+.runners li .duo .av.sm + .av.sm { margin-left: -9px; }
+.runners li.pair { grid-template-columns: 20px 44px 1fr auto; }
+
+.emoji { display: flex; flex-wrap: wrap; gap: 14px 18px; }
+.emoji div { display: grid; justify-items: center; gap: 4px; min-width: 56px; }
+.emoji .e { font-size: 40px; line-height: 1; height: 44px; display: grid; place-items: center; }
+.emoji img { width: 42px; height: 42px; object-fit: contain; }
+.emoji .c { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; }
+.bar span { display: block; height: 100%; }
+.keys { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink-2); }
+.keys i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; text-align: center; }
+.vs .side { display: grid; justify-items: center; gap: 8px; min-width: 0; }
+.vs .side .name { font: 700 17px/1.15 var(--display); overflow-wrap: anywhere; }
+.vs .score { font: 900 34px/1 var(--display); color: var(--hot); white-space: nowrap; }
+.vs .side .w { font-size: 13px; color: var(--ink-3); }
+
+nav.chapters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: rgba(11, 10, 16, 0.82); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: rgba(11, 10, 16, 0.95); }
+nav.chapters .row { max-width: 1180px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); padding-block: 10px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+nav.chapters a { flex: none; color: var(--ink-2); text-decoration: none; font: 600 13px/1 var(--body); padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); }
+nav.chapters a:hover, nav.chapters a:focus-visible { color: var(--ink); border-color: var(--ink-2); outline: none; }
+section { scroll-margin-top: 60px; }
+footer.inner { padding-block: 40px 60px; color: var(--ink-3); font-size: 14px; gap: 10px; }
+footer p { margin: 0; max-width: 80ch; }
+
+.c-intro { --bg: #22093f; --hot: #ff5ad9; --cool: #7b3dff; }
+.c-chat { --bg: #062b23; --hot: #b6f53b; --cool: #0d8f6a; }
+.c-voice { --bg: #08214f; --hot: #5cc8ff; --cool: #3a56ff; }
+.c-pebbles { --bg: #3a1f02; --hot: #ffc23d; --cool: #d2561c; }
+.c-casino { --bg: #3d0715; --hot: #ff5c72; --cool: #a3123a; }
+.c-drops { --bg: #023236; --hot: #3ff0d2; --cool: #1676b8; }
+.c-cards { --bg: #1d0f45; --hot: #b9a1ff; --cool: #e04fb3; }
+.c-rivals { --bg: #3a1405; --hot: #ff9147; --cool: #b8261b; }
+.c-chaos { --bg: #150c0c; --hot: #ff4a3d; --cool: #5a1a8a; }
+.c-outro { --bg: #2a0a3a; --hot: #ff7ad1; --cool: #ffb03d; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+<nav class="chapters" aria-label="Chapters"><div class="row">
+  <a href="#chat">Chat</a><a href="#voice">Voice</a><a href="#pebbles">Pebbles</a><a href="#casino">Casino</a><a href="#drops">Drops</a><a href="#cards">Cards</a><a href="#rivals">Rivalries</a><a href="#chaos">Chaos</a>
+</div></nav>
+<main id="app"></main>
+<footer class="inner" id="foot"></footer>
+
+<script>
+const W = {"window":{"from":1788220800000,"to":1792872234609,"days":54},"chat":{"total":221625,"people":79,"mostMessages":[{"id":"1158633440497909822","v":20219},{"id":"1452066807153295461","v":19042},{"id":"1357793223103484125","v":17640},{"id":"1069581333694795828","v":15061},{"id":"1531401125826138173","v":14455}],"mostTagged":[{"id":"1097921188765892719","v":860},{"id":"1171171547524898937","v":742},{"id":"1531401125826138173","v":574},{"id":"1158633440497909822","v":556},{"id":"1452066807153295461","v":469}],"tagger":[{"id":"1158633440497909822","v":1000},{"id":"1452066807153295461","v":842},{"id":"1069581333694795828","v":767}],"mostRepliedTo":[{"id":"1158633440497909822","v":6308},{"id":"1531401125826138173","v":4900},{"id":"1171171547524898937","v":4761}],"crowdFavourite":[{"id":"1357793223103484125","v":1709},{"id":"1452066807153295461","v":1535},{"id":"1531401125826138173","v":1470}],"gifs":[{"id":"1109447484872347760","v":528},{"id":"734444708922654750","v":473},{"id":"1452066807153295461","v":386}],"images":[{"id":"1078039211413864518","v":552},{"id":"1357793223103484125","v":264},{"id":"734444708922654750","v":250}],"emojiFiend":[{"id":"1452066807153295461","v":6087,"fav":{"char":"😭","v":2100}},{"id":"1357793223103484125","v":5140,"fav":{"char":"😭","v":709}},{"id":"1158633440497909822","v":2921,"fav":{"char":"🤣","v":753}}],"tagPairs":[{"a":"1357793223103484125","b":"1531401125826138173","v":2550},{"a":"1097921188765892719","b":"1158633440497909822","v":2038},{"a":"1069581333694795828","b":"1452066807153295461","v":1922},{"a":"1158633440497909822","b":"1171171547524898937","v":1822},{"a":"1158633440497909822","b":"1531401125826138173","v":1776}],"convoPairs":[{"a":"1357793223103484125","b":"1531401125826138173","v":4688},{"a":"1109447484872347760","b":"1452066807153295461","v":3595},{"a":"1069581333694795828","b":"1452066807153295461","v":3252},{"a":"1158633440497909822","b":"1171171547524898937","v":3157},{"a":"1158633440497909822","b":"1531401125826138173","v":2371}],"emoji":[{"char":"😭","v":8648},{"char":"😂","v":3643},{"char":"🤣","v":2400},{"name":"emoji_38","url":"https://cdn.discordapp.com/emojis/1433448538725154886.webp?size=96","v":1189},{"name":"emoji_50","url":"https://cdn.discordapp.com/emojis/1475631838918869066.webp?size=96","v":1163},{"char":"💀","v":765},{"name":"emoji_43","url":"https://cdn.discordapp.com/emojis/1433448745281781813.webp?size=96","v":644},{"char":"😔","v":530},{"char":"💔","v":506},{"char":"😊","v":496},{"name":"emoji_58","url":"https://cdn.discordapp.com/emojis/1498289840494739486.webp?size=96","v":439},{"char":"😼","v":436}],"totalEmoji":34254,"totalGifs":3602,"channels":[{"name":"𖧧⋆main-chat","msgs":88428},{"name":"☆ shameless pebbles farming","msgs":32581},{"name":"☆ main vc","msgs":22081},{"name":"☆ yap lab","msgs":20088},{"name":"☆ music","msgs":13485}]},"stats":{"since":1788220800000,"until":1792871093058,"pebbles":{"totalEarned":986016,"topEarners":[{"id":"1452066807153295461","v":106631,"sources":{"voice":69404,"message":23692,"quest":2590,"daily_claim":5200,"drop":1245,"boost_reward":3000,"achievement":1500}},{"id":"734444708922654750","v":87771,"sources":{"voice":62358,"message":8858,"daily_claim":5400,"drop":1975,"drop_streak":40,"quest":140,"achievement":9000}},{"id":"1109447484872347760","v":75162,"sources":{"message":18884,"voice":44138,"drop":1880,"daily_claim":5760,"quest":600,"achievement":3900}},{"id":"1158633440497909822","v":74504,"sources":{"message":26752,"drop":11470,"daily_claim":5000,"voice":18992,"drop_streak":1620,"quest":2870,"achievement":7800}},{"id":"1531401125826138173","v":65209,"sources":{"voice":23268,"message":16546,"drop_streak":1200,"drop":9820,"achievement":5400,"quest":4000,"daily_claim":4975}}],"topSpenders":[{"id":"1158633440497909822","v":131250},{"id":"1171171547524898937","v":88800},{"id":"1452066807153295461","v":76800},{"id":"734444708922654750","v":72750},{"id":"1357793223103484125","v":67500}],"totalSpent":906650},"giving":{"mostSent":[{"id":"1452066807153295461","v":64308},{"id":"734444708922654750","v":53200},{"id":"1531401125826138173","v":43931},{"id":"1069581333694795828","v":39261},{"id":"1171171547524898937","v":35788}],"mostGifts":[{"id":"1107365174974894131","v":46},{"id":"343718330416496641","v":31},{"id":"1373983048005324863","v":30},{"id":"1357793223103484125","v":28},{"id":"1171171547524898937","v":18}],"topPairs":[{"a":"1452066807153295461","b":"734444708922654750","pebbles":44397,"gifts":4},{"a":"1069581333694795828","b":"1531401125826138173","pebbles":35210,"gifts":0},{"a":"734444708922654750","b":"979406784076861520","pebbles":32500,"gifts":0}],"totalSent":418864,"totalGifts":217},"daily":{"longestStreak":[{"id":"979406784076861520","v":31},{"id":"1069581333694795828","v":29},{"id":"1078039211413864518","v":29},{"id":"1097921188765892719","v":29},{"id":"1109447484872347760","v":29}],"claims":{"1109447484872347760":45,"1436376384216895648":43,"767702872300847114":37,"1069581333694795828":35,"1097921188765892719":34}},"voice":{"top":[{"id":"1452066807153295461","v":33387.33333333332},{"id":"734444708922654750","v":31521.999999999985},{"id":"1109447484872347760","v":22307.33333333332},{"id":"1531401125826138173","v":11680},{"id":"979406784076861520","v":10454},{"id":"1158633440497909822","v":10317.333333333334},{"id":"1171171547524898937","v":9061.333333333334},{"id":"767702872300847114","v":8260.666666666666}],"totalMinutes":193213.33333333328,"people":47},"casino":{"rounds":9238,"wagered":1398569,"houseKept":92346,"mostRounds":[{"id":"1395868079971504314","v":3446,"fav":"mines"},{"id":"1357793223103484125","v":1605,"fav":"mines"},{"id":"1171171547524898937","v":909,"fav":"hilo"},{"id":"1069581333694795828","v":782,"fav":"hilo"},{"id":"767702872300847114","v":677,"fav":"mines"}],"highRollers":[{"id":"1069581333694795828","v":250147},{"id":"1395868079971504314","v":246396},{"id":"1171171547524898937","v":235330}],"biggestWin":{"id":"459455078982483975","profit":9500,"game":"mines","bet":500},"luckiest":{"id":"1069581333694795828","z":1.235478494107774,"hit":164,"exp":178.95648519866913},"unluckiest":{"id":"767702872300847114","z":-1.3194632529332362,"hit":216,"exp":198.16881832048395},"bestNet":[{"id":"709094801412456520","v":141},{"id":"362206848612302848","v":-10},{"id":"1436376384216895648","v":-28}],"worstNet":[{"id":"1395868079971504314","v":-21467},{"id":"1171171547524898937","v":-16520},{"id":"459455078982483975","v":-16186}]},"drops":{"total":1518,"winners":[{"id":"1158633440497909822","v":264},{"id":"1357793223103484125","v":246},{"id":"1531401125826138173","v":225},{"id":"1171171547524898937","v":115},{"id":"1097921188765892719","v":103}],"bestStreak":[{"id":"1158633440497909822","v":10},{"id":"1531401125826138173","v":9},{"id":"1357793223103484125","v":8}],"fastest":{"id":"1531401125826138173","ms":1448,"kind":"scramble"},"people":34},"speedruns":[{"kind":"flag","id":"1531401125826138173","ms":18576},{"kind":"sequence","id":"1531401125826138173","ms":43936},{"kind":"math","id":"1531401125826138173","ms":49389},{"kind":"capital","id":"1097921188765892719","ms":51380}],"speedrunCount":2274,"cards":{"packs":7385,"mostPacks":[{"id":"1158633440497909822","v":941},{"id":"1171171547524898937","v":728},{"id":"1452066807153295461","v":582},{"id":"1357793223103484125","v":520},{"id":"734444708922654750","v":516}],"cards":9842,"mostCards":[{"id":"1158633440497909822","v":2668},{"id":"1109447484872347760","v":1124},{"id":"1531401125826138173","v":1018}],"legendaries":[{"id":"734444708922654750","v":47},{"id":"1357793223103484125","v":32},{"id":"1109447484872347760","v":25}],"specials":[{"id":"734444708922654750","v":8},{"id":"1158633440497909822","v":4},{"id":"1097921188765892719","v":2}],"comics":[{"id":"1109447484872347760","v":12},{"id":"1158633440497909822","v":12},{"id":"1531401125826138173","v":11}],"setsDone":[{"id":"1158633440497909822","v":23},{"id":"1171171547524898937","v":23},{"id":"1357793223103484125","v":23}],"totalSets":322,"firstCollection":{"id":"734444708922654750","at":1790714932233},"recyclers":[{"id":"1158633440497909822","v":248},{"id":"767702872300847114","v":163},{"id":"1452066807153295461","v":111}]},"rps":{"games":205,"topPair":{"a":"1069581333694795828","b":"1171171547524898937","games":14,"wins":{"1171171547524898937":5,"1069581333694795828":9},"draws":0},"hardestToBeat":{"id":"1076635120397713520","played":12,"won":9}},"ttt":{"games":49,"topPair":{"a":"1097921188765892719","b":"1393566139526676593","games":7,"wins":{"1097921188765892719":3,"1393566139526676593":1},"draws":3},"hardestToBeat":{"id":"1097921188765892719","played":43,"won":17}},"heists":[{"id":34,"status":"caught","real":true,"crew":["1069581333694795828","704384670107959377","767702872300847114"],"alarm":100},{"id":36,"status":"escaped","real":true,"crew":["1158633440497909822","1171171547524898937","1357793223103484125"],"alarm":30}],"heistHaul":[{"user_id":"1158633440497909822","delta":31844},{"user_id":"1171171547524898937","delta":31844},{"user_id":"1357793223103484125","delta":31844}],"jail":{"top":[{"id":"1078039211413864518","v":868.7614833333333},{"id":"362206848612302848","v":241.05193333333332},{"id":"1237484927985909842","v":120.806}],"sentences":30},"arabicFee":{"top":[{"id":"1030448326660849695","v":114},{"id":"1107365174974894131","v":79},{"id":"1097921188765892719","v":12}],"total":217},"museum":5,"poker":{"tables":10,"biggestPot":{"id":"1097921188765892719","v":2000}},"blocked":["1354996225291587594"]},"listener":{"id":"734444708922654750","hours":525.3666666666664,"msgs":5259,"ratio":10.010151640124361},"people":{"1158633440497909822":{"name":"✰𝒍𝒆𝒆𝒏𝒂✰","handle":"le3na_76","avatar":"https://cdn.discordapp.com/avatars/1158633440497909822/384880b9225d4a13e479edaa23b3ec87.png?size=128","here":true},"1452066807153295461":{"name":"Daddy Jeonson","handle":"jeon05679","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1452066807153295461/avatars/9ed738674cd92a30e04b2312ef8f6ee1.png?size=128","here":true},"1357793223103484125":{"name":"Zaytoona 🫒","handle":"volimacke","avatar":"https://cdn.discordapp.com/avatars/1357793223103484125/76d578ea5b875f93ab322518d99917e0.png?size=128","here":true},"1069581333694795828":{"name":"Hasina jaan","handle":"abujee_","avatar":"https://cdn.discordapp.com/avatars/1069581333694795828/0d34645288f1faf0e69abad28678b292.png?size=128","here":true},"1531401125826138173":{"name":"Batata m3 debth remen🥔","handle":"obsidian_sicario","avatar":"https://cdn.discordapp.com/avatars/1531401125826138173/2af8497b665190f7a76c6d76c50954ae.png?size=128","here":true},"1097921188765892719":{"name":"m3z","handle":"alex_hue4","avatar":"https://cdn.discordapp.com/avatars/1097921188765892719/c7311db5cafc947642337622717ca077.png?size=128","here":true},"1171171547524898937":{"name":"𝓡𝓸𝓴𝓪⭑","handle":"roka_y","avatar":"https://cdn.discordapp.com/avatars/1171171547524898937/404a30031a1f226e49075e2514e764c2.png?size=128","here":true},"1109447484872347760":{"name":"Aurora","handle":"__xer0_____","avatar":"https://cdn.discordapp.com/avatars/1109447484872347760/f4a564e01734e607acd1a0b4eb128f55.png?size=128","here":true},"734444708922654750":{"name":"Aze","handle":"azelax","avatar":"https://cdn.discordapp.com/avatars/734444708922654750/83f9d0b6aac7b40e734bc48d1adb9baf.png?size=128","here":true},"1078039211413864518":{"name":"Tacos 🌮","handle":"asesino3199","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1078039211413864518/avatars/0c063c6ae9e7dc5afa1201a39f3c6521.png?size=128","here":true},"1107365174974894131":{"name":"-Flash","handle":"i_hate_edaters7007","avatar":"https://cdn.discordapp.com/avatars/1107365174974894131/cc1a0cd08ebc0fb352a9cefacb417fba.png?size=128","here":true},"343718330416496641":{"name":"Cute bhai💗","handle":"silver.01_","avatar":"https://cdn.discordapp.com/avatars/343718330416496641/4de1c46ef1c619cd3adfc9a21b4286be.png?size=128","here":true},"1373983048005324863":{"name":"scarlett","handle":"realbatman.111","avatar":"https://cdn.discordapp.com/avatars/1373983048005324863/eeafdde4b50aa3876ef406bd2d4766b0.png?size=128","here":true},"979406784076861520":{"name":"Mathyess","handle":"shintoron","avatar":"https://cdn.discordapp.com/avatars/979406784076861520/ca8a3230ad97c4dd622999b7ac39098d.png?size=128","here":true},"767702872300847114":{"name":"pearl","handle":"pearl__1158","avatar":"https://cdn.discordapp.com/avatars/767702872300847114/ea016793ada11b01fe811570dd0aca37.png?size=128","here":true},"1395868079971504314":{"name":"Anna","handle":"jstsomegirlx2","avatar":"https://cdn.discordapp.com/avatars/1395868079971504314/7f4ad0d27891ed6fa64e5bedd4bec587.png?size=128","here":true},"459455078982483975":{"name":"اجنبی","handle":".rajaal","avatar":"https://cdn.discordapp.com/avatars/459455078982483975/ba1f2be4d174fedcab5f2dacf20a322f.png?size=128","here":true},"709094801412456520":{"name":"5","handle":"yeahbabyidonefuckthegameup","avatar":"https://cdn.discordapp.com/avatars/709094801412456520/61e10c19bd5c231f4d07759ae680726b.png?size=128","here":false},"362206848612302848":{"name":"haiguys","handle":"haiguys","avatar":"https://cdn.discordapp.com/avatars/362206848612302848/621b2d3442de03d5bc193fcce6ef61ac.png?size=128","here":false},"1436376384216895648":{"name":"Miko","handle":"yu_miko02","avatar":"https://cdn.discordapp.com/avatars/1436376384216895648/d9dfac7a6d5f6db7a2a127fdcd0c043f.png?size=128","here":true},"1076635120397713520":{"name":"𝓟𝓻𝓮𝓼𝓱𝔂𝔃","handle":"hsn_02","avatar":"https://cdn.discordapp.com/avatars/1076635120397713520/a_4d682c84ae99c476ee28b614bd519942.png?size=128","here":true},"1393566139526676593":{"name":"Lafloofi","handle":"ethereal.mogger","avatar":"https://cdn.discordapp.com/avatars/1393566139526676593/2206abb00da666fc2dbe94c2c7b3aa47.png?size=128","here":true},"704384670107959377":{"name":"Cute casturd","handle":"casper_71","avatar":"https://cdn.discordapp.com/avatars/704384670107959377/838b8604f0a1540e68540b6c93b90dfc.png?size=128","here":true},"1237484927985909842":{"name":"Epsilon-SYX","handle":"epsilon_syx","avatar":"https://cdn.discordapp.com/avatars/1237484927985909842/5026a570425affa983a04bc5449d93dc.png?size=128","here":false},"1030448326660849695":{"name":"Dodi 🪱","handle":"h_jz","avatar":"https://cdn.discordapp.com/avatars/1030448326660849695/7cf0382443dd3a6fbadcccbac409ab1d.png?size=128","here":true}}};
+const S = W.stats;
+const fmt = (n) => Math.round(n).toLocaleString('en-US');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const P = (id) => W.people[id] ?? { name: 'someone', handle: null, avatar: null };
+const hrs = (min) => fmt(min / 60);
+const day = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const plural = (n, one, many = one + 's') => `${fmt(n)} ${n === 1 ? one : many}`;
+const GAME = { mines: 'Mines', hilo: 'Higher or Lower', blackjack: 'Blackjack', roulette: 'Roulette', slots: 'Slots' };
+const KIND = { flag: 'Flags', capital: 'Capitals', sequence: 'Sequences', math: 'Math', scramble: 'Scramble', trivia: 'Trivia', grab: 'Grab' };
+
+function av(id, sm = false) {
+  const p = P(id);
+  const initial = esc((p.name.trim()[0] ?? '?').toUpperCase());
+  return p.avatar
+    ? `<img class="av${sm ? ' sm' : ''}" src="${esc(p.avatar)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'av${sm ? ' sm' : ''}',textContent:'${initial}'}))">`
+    : `<span class="av${sm ? ' sm' : ''}">${initial}</span>`;
+}
+const who = (id) => `<div class="who"><span class="name">${esc(P(id).name)}</span>${P(id).handle ? `<span class="handle">@${esc(P(id).handle)}</span>` : ''}</div>`;
+const runners = (list, val, from = 1) => (list.length > from
+  ? `<ol class="runners">${list.slice(from).map((x, i) => `<li><span class="rk">${i + from + 1}</span>${av(x.id, true)}<span class="nm">${esc(P(x.id).name)}</span><span class="v">${val(x)}</span></li>`).join('')}</ol>` : '');
+const pairRunners = (list, val, from = 1) => (list.length > from
+  ? `<ol class="runners">${list.slice(from).map((x, i) => `<li class="pair"><span class="rk">${i + from + 1}</span><span class="duo">${av(x.a, true)}${av(x.b, true)}</span><span class="nm">${esc(P(x.a).name)} & ${esc(P(x.b).name)}</span><span class="v">${val(x)}</span></li>`).join('')}</ol>` : '');
+
+/** One award: who won, what for, and the runners-up. */
+function award(label, list, stat, val, extra = '', wide = false) {
+  if (!list || !list.length) return '';
+  const w = list[0];
+  return `<article class="award${wide ? ' wide' : ''}"><span class="label">${label}</span>
+    <div class="winner">${av(w.id)}${who(w.id)}</div><p class="stat">${stat(w)}</p>${extra}${runners(list, val)}</article>`;
+}
+function pairAward(label, list, stat, val, extra = '') {
+  if (!list || !list.length) return '';
+  const w = list[0];
+  return `<article class="award"><span class="label">${label}</span>
+    <div class="winner"><span class="duo">${av(w.a)}${av(w.b)}</span><div class="who"><span class="name">${esc(P(w.a).name)} & ${esc(P(w.b).name)}</span></div></div>
+    <p class="stat">${stat(w)}</p>${extra}${pairRunners(list, val)}</article>`;
+}
+function rivalry(label, r, game) {
+  if (!r?.topPair) return '';
+  const { a, b, games, wins, draws } = r.topPair;
+  const wa = wins[a] ?? 0, wb = wins[b] ?? 0;
+  const lead = wa === wb ? 'Dead level.' : `${esc(P(wa > wb ? a : b).name)} leads.`;
+  return `<article class="award"><span class="label">${label}</span>
+    <div class="vs"><div class="side">${av(a)}<span class="name">${esc(P(a).name)}</span></div><span class="score">${wa}–${wb}</span><div class="side">${av(b)}<span class="name">${esc(P(b).name)}</span></div></div>
+    <p class="note">${plural(games, `${game} game`)} against each other${draws ? `, ${plural(draws, 'draw')}` : ''}. ${lead}</p></article>`;
+}
+const band = (id, cls, kicker, title, lead, body) => `<section id="${id}" class="band ${cls}"><div class="inner"><div class="head"><span class="kicker">${kicker}</span><h2>${title}</h2>${lead ? `<p class="lead">${lead}</p>` : ''}</div>${body}</div></section>`;
+const bigs = (items) => `<div class="big">${items.filter(Boolean).map(([n, k]) => `<div><div class="n">${n}</div><div class="k">${k}</div></div>`).join('')}</div>`;
+
+const C = W.chat;
+const vTotal = S.voice.totalMinutes;
+let html = '';
+
+/* ---- intro ---- */
+html += `<section class="band c-intro"><div class="inner"><span class="kicker">The Secret Lair · ${day(W.window.from)} – ${day(W.window.to)}</span>
+  <h1>The Lair,<br>Wrapped.</h1><p class="lead">Everything since ${day(W.window.from)}: who talked the most, who got tagged the most, who basically lived in VC, and everything Pebble saw along the way.</p>
+  ${bigs([[fmt(C.total), 'messages sent'], [hrs(vTotal), 'hours in voice chat'], [fmt(S.pebbles.totalEarned), 'pebbles earned'], [fmt(S.casino.rounds), 'casino rounds played'], [fmt(S.drops.total), 'drops dropped'], [fmt(S.cards.packs), 'card packs opened']])}
+</div></section>`;
+
+/* ---- chat ---- */
+const topCh = C.channels[0];
+html += band('chat', 'c-chat', 'Chapter 1', 'The chat', `${fmt(C.people)} people sent ${fmt(C.total)} messages. ${topCh ? `The busiest channel was #${esc(topCh.name)}, with ${fmt(topCh.msgs)} of them.` : ''}`,
+  `<div class="grid">
+  ${award('Most messages', C.mostMessages, (w) => `<b>${fmt(w.v)}</b> messages. That's ${Math.round((100 * w.v) / C.total)}% of the whole chat.`, (x) => fmt(x.v))}
+  ${award('Most tagged', C.mostTagged, (w) => `Tagged <b>${fmt(w.v)}</b> times. Everyone needs them for something.`, (x) => fmt(x.v))}
+  ${award('The tagger', C.tagger, (w) => `Tagged other people <b>${fmt(w.v)}</b> times.`, (x) => fmt(x.v))}
+  ${pairAward('The duo', C.tagPairs, (w) => `Tagged and replied to each other <b>${fmt(w.v)}</b> times.`, (x) => fmt(x.v))}
+  ${pairAward('Always talking', C.convoPairs, (w) => `<b>${fmt(w.v)}</b> back-and-forths: one says something, the other answers within two minutes.`, (x) => fmt(x.v))}
+  ${award('Most replied to', C.mostRepliedTo, (w) => `<b>${fmt(w.v)}</b> replies to their messages.`, (x) => fmt(x.v))}
+  ${award('Crowd favourite', C.crowdFavourite, (w) => `Their messages got <b>${fmt(w.v)}</b> reactions.`, (x) => fmt(x.v))}
+  ${award('GIF lord', C.gifs, (w) => `<b>${fmt(w.v)}</b> GIFs sent.`, (x) => fmt(x.v))}
+  ${award('Picture person', C.images, (w) => `<b>${fmt(w.v)}</b> pictures posted.`, (x) => fmt(x.v))}
+  ${award('Emoji fiend', C.emojiFiend, (w) => `<b>${fmt(w.v)}</b> emoji used${w.fav ? `, mostly ${w.fav.url ? `<img src="${esc(w.fav.url)}" alt=":${esc(w.fav.name)}:" style="width:22px;height:22px;vertical-align:-5px">` : esc(w.fav.char)}` : ''}.`, (x) => fmt(x.v))}
+  ${C.emoji.length ? `<article class="award wide"><span class="label">The server's favourite emoji</span><div class="emoji">${C.emoji.map((e) => `<div>${e.url ? `<img src="${esc(e.url)}" alt=":${esc(e.name)}:" loading="lazy">` : `<span class="e">${esc(e.char)}</span>`}<span class="c">${fmt(e.v)}</span></div>`).join('')}</div><p class="note">${fmt(C.totalEmoji)} emoji in all.</p></article>` : ''}
+  </div>`);
+
+/* ---- voice ---- */
+const L = W.listener;
+html += band('voice', 'c-voice', 'Chapter 2', 'Voice chat', `${fmt(S.voice.people)} people spent ${hrs(vTotal)} hours in VC between them. That's ${fmt(vTotal / 60 / 24)} days of talking.`,
+  `<div class="grid">
+  ${award('Lived in VC', S.voice.top, (w) => `<b>${hrs(w.v)}</b> hours in voice. About ${fmt(w.v / 60 / W.window.days)} hours a day.`, (x) => `${hrs(x.v)} h`)}
+  ${L ? `<article class="award"><span class="label">The quiet listener</span><div class="winner">${av(L.id)}${who(L.id)}</div><p class="stat"><b>${fmt(L.hours)}</b> hours in VC and only <b>${fmt(L.msgs)}</b> messages. Here for the vibes.</p></article>` : ''}
+  </div>`);
+
+/* ---- pebbles ---- */
+const SRC = [['voice', 'Voice', '#5cc8ff'], ['message', 'Chat', '#b6f53b'], ['drop', 'Drops', '#3ff0d2'], ['quest', 'Quests', '#ffc23d'], ['daily_claim', 'Daily', '#ff9147'], ['achievement', 'Cards', '#b9a1ff'], ['boost_reward', 'Boosting', '#ff5ad9'], ['drop_streak', 'Streaks', '#ff5c72']];
+const te = S.pebbles.topEarners[0];
+const srcBar = te ? (() => { const tot = Object.values(te.sources ?? {}).reduce((a, b) => a + b, 0); const used = SRC.filter(([k]) => te.sources?.[k]);
+  return `<div class="bar" role="img" aria-label="Where their pebbles came from">${used.map(([k, , c]) => `<span style="width:${(100 * te.sources[k]) / tot}%;background:${c}"></span>`).join('')}</div>
+  <div class="keys">${used.map(([k, l, c]) => `<span><i style="background:${c}"></i>${l} ${Math.round((100 * te.sources[k]) / tot)}%</span>`).join('')}</div>`; })() : '';
+const gp = S.giving.topPairs;
+html += band('pebbles', 'c-pebbles', 'Chapter 3', 'Pebbles', `The server earned ${fmt(S.pebbles.totalEarned)} pebbles by chatting, sitting in VC, winning drops and doing quests, and spent ${fmt(S.pebbles.totalSpent)} of them. ${fmt(S.giving.totalSent)} were sent to friends.`,
+  `<div class="grid">
+  ${award('Top earner', S.pebbles.topEarners, (w) => `Earned <b>${fmt(w.v)}</b> pebbles just by being around.`, (x) => fmt(x.v), srcBar)}
+  ${award('Big spender', S.pebbles.topSpenders, (w) => `Spent <b>${fmt(w.v)}</b> pebbles in the shop and on packs.`, (x) => fmt(x.v))}
+  ${award('Most generous', S.giving.mostSent, (w) => `Sent <b>${fmt(w.v)}</b> pebbles to other people.`, (x) => fmt(x.v))}
+  ${gp.length ? pairAward('Sharing is caring', gp.map((p) => ({ ...p, v: p.pebbles })), (w) => `<b>${fmt(w.pebbles)}</b> pebbles${w.gifts ? ` and ${plural(w.gifts, 'gift')}` : ''} passed between them.`, (x) => fmt(x.pebbles)) : ''}
+  ${award('Gift giver', S.giving.mostGifts, (w) => `Gave away <b>${plural(w.v, 'gift')}</b> from the shop.`, (x) => fmt(x.v))}
+  ${award('Never misses a daily', S.daily.longestStreak, (w) => `Claimed the daily bonus <b>${w.v} days</b> in a row.`, (x) => `${x.v} days`)}
+  </div>`);
+
+/* ---- casino ---- */
+const K = S.casino;
+html += band('casino', 'c-casino', 'Chapter 4', 'The casino', `${fmt(K.rounds)} rounds, ${fmt(K.wagered)} pebbles bet. The house kept ${fmt(K.houseKept)} of them.`,
+  `<div class="grid">
+  ${award('Regular', K.mostRounds, (w) => `<b>${fmt(w.v)}</b> rounds, mostly ${GAME[w.fav] ?? w.fav}.`, (x) => fmt(x.v))}
+  ${award('High roller', K.highRollers, (w) => `Bet <b>${fmt(w.v)}</b> pebbles in total.`, (x) => fmt(x.v))}
+  ${K.biggestWin ? award('Biggest single win', [{ id: K.biggestWin.id }], () => `<b>+${fmt(K.biggestWin.profit)}</b> on one ${GAME[K.biggestWin.game] ?? K.biggestWin.game} round, from a ${fmt(K.biggestWin.bet)} bet.`, () => '') : ''}
+  ${award('Beat the house', K.bestNet.filter((x) => x.v > 0), (w) => `Came out <b>+${fmt(w.v)}</b> ahead.`, (x) => `+${fmt(x.v)}`)}
+  ${award('The house thanks you', K.worstNet.filter((x) => x.v < 0), (w) => `Down <b>${fmt(-w.v)}</b> pebbles. The house thanks them.`, (x) => `−${fmt(-x.v)}`)}
+  ${K.luckiest ? award('Luckiest at Mines', [{ id: K.luckiest.id }], () => `Hit <b>${fmt(K.luckiest.hit)}</b> mines when about ${fmt(K.luckiest.exp)} were expected.`, () => '') : ''}
+  ${K.unluckiest && K.unluckiest.id !== K.luckiest?.id ? award('Unluckiest at Mines', [{ id: K.unluckiest.id }], () => `Hit <b>${fmt(K.unluckiest.hit)}</b> mines when about ${fmt(K.unluckiest.exp)} were expected. Pure bad luck.`, () => '') : ''}
+  </div>`);
+
+/* ---- drops & speedruns ---- */
+const D = S.drops;
+html += band('drops', 'c-drops', 'Chapter 5', 'Drops &amp; speedruns', `${fmt(D.total)} drops landed in chat and ${fmt(D.people)} different people won at least one. ${fmt(S.speedrunCount)} speedruns were attempted.`,
+  `<div class="grid">
+  ${award('Drop champion', D.winners, (w) => `Won <b>${fmt(w.v)}</b> drops. ${Math.round((100 * w.v) / D.total)}% of all of them.`, (x) => fmt(x.v))}
+  ${award('On a roll', D.bestStreak, (w) => `Won <b>${w.v}</b> drops in a row.`, (x) => `${x.v} in a row`)}
+  ${D.fastest ? award('Fastest fingers', [{ id: D.fastest.id }], () => `Answered a ${KIND[D.fastest.kind] ?? D.fastest.kind} drop in <b>${(D.fastest.ms / 1000).toFixed(1)} seconds</b>.`, () => '') : ''}
+  ${S.speedruns.length ? `<article class="award"><span class="label">Speedrun records</span><ol class="runners" style="border-top:0;padding-top:0">${S.speedruns.map((r) => `<li><span class="rk"></span>${av(r.id, true)}<span class="nm">${esc(KIND[r.kind] ?? r.kind)}: ${esc(P(r.id).name)}</span><span class="v">${(r.ms / 1000).toFixed(1)}s</span></li>`).join('')}</ol><p class="note">The fastest perfect run of each kind.</p></article>` : ''}
+  </div>`);
+
+/* ---- cards ---- */
+const CD = S.cards;
+html += band('cards', 'c-cards', 'Chapter 6', 'Cards', `${fmt(CD.packs)} packs opened and ${fmt(CD.cards)} cards pulled. ${fmt(CD.totalSets)} people's sets were completed.`,
+  `<div class="grid">
+  ${award('Pack addict', CD.mostPacks, (w) => `Opened <b>${fmt(w.v)}</b> packs.`, (x) => fmt(x.v))}
+  ${award('Collector', CD.mostCards, (w) => `Pulled <b>${fmt(w.v)}</b> cards.`, (x) => fmt(x.v))}
+  ${award('Legendary luck', CD.legendaries, (w) => `<b>${plural(w.v, 'legendary', 'legendaries')}</b> pulled.`, (x) => fmt(x.v))}
+  ${award('One of one', CD.specials, (w) => `Pulled <b>${plural(w.v, 'special card')}</b>, the 1-of-1 prints.`, (x) => fmt(x.v))}
+  ${award('Comic hunter', CD.comics, (w) => `Found <b>${plural(w.v, 'comic page')}</b>.`, (x) => fmt(x.v))}
+  ${award('Set finisher', CD.setsDone, (w) => `Completed <b>${plural(w.v, 'set')}</b>.`, (x) => fmt(x.v))}
+  ${CD.firstCollection ? award('First to collect them all', [{ id: CD.firstCollection.id }], () => `Finished the whole collection first, on ${day(CD.firstCollection.at)}.`, () => '') : ''}
+  ${award('Recycler', CD.recyclers, (w) => `Recycled spare cards <b>${plural(w.v, 'time')}</b>.`, (x) => fmt(x.v))}
+  </div>`);
+
+/* ---- rivalries ---- */
+const tough = S.rps.hardestToBeat;
+html += band('rivals', 'c-rivals', 'Chapter 7', 'Rivalries', `${fmt(S.rps.games)} rock paper scissors games and ${fmt(S.ttt.games)} games of tic tac toe.`,
+  `<div class="grid">
+  ${rivalry('Rock paper scissors rivals', S.rps, 'RPS')}
+  ${rivalry('Tic tac toe rivals', S.ttt, 'tic tac toe')}
+  ${tough ? award('Hardest to beat', [{ id: tough.id }], () => `Won <b>${Math.round((100 * tough.won) / tough.played)}%</b> of ${fmt(tough.played)} rock paper scissors games.`, () => '') : ''}
+  </div>`);
+
+/* ---- chaos ---- */
+const robbed = S.heists.find((h) => h.status === 'escaped');
+const caught = S.heists.filter((h) => h.status === 'caught');
+const haul = S.heistHaul.reduce((a, h) => a + h.delta, 0);
+const crewCard = (h, title, text) => `<article class="award"><span class="label">${title}</span><div class="winner"><span class="duo">${h.crew.map((c) => av(c)).join('')}</span></div><p class="stat">${h.crew.map((c) => esc(P(c).name)).join(', ')}</p><p class="note">${text}</p></article>`;
+html += band('chaos', 'c-chaos', 'Chapter 8', 'Chaos', `Heists, jail time, and the fines nobody saw coming.`,
+  `<div class="grid">
+  ${robbed ? crewCard(robbed, 'They robbed the vault', `Got away with <b>${fmt(haul)}</b> pebbles, everything in the vault, split ${robbed ? robbed.crew.length : 3} ways.`) : ''}
+  ${caught.map((h) => crewCard(h, 'Caught red-handed', `Tried the vault and got caught with the alarm at ${h.alarm}%. Straight to jail.`)).join('')}
+  ${award('Most time in jail', S.jail.top, (w) => `<b>${fmt(w.v / 60)}</b> hours behind bars.`, (x) => `${fmt(x.v / 60)} h`)}
+  ${award('Fined for Arabic', S.arabicFee.top, (w) => `Paid <b>${fmt(w.v)}</b> pebbles in Arabic-letter fees.`, (x) => fmt(x.v))}
+  ${S.poker.biggestPot ? award('Biggest poker pot', [{ id: S.poker.biggestPot.id }], () => `Walked away from a table with <b>${fmt(S.poker.biggestPot.v)}</b> pebbles.`, () => '') : ''}
+  ${S.museum ? `<article class="award"><span class="label">Taco's Museum</span><p class="stat"><b>${fmt(S.museum)}</b> exhibits hung so far. The collection grows.</p></article>` : ''}
+  </div>`);
+
+/* ---- outro ---- */
+html += `<section class="band c-outro"><div class="inner"><span class="kicker">That's a wrap</span><h2>Same time next year?</h2>
+  <p class="lead">Every number here comes from the server itself: the chat history, and everything Pebble keeps track of.</p></div></section>`;
+
+document.getElementById('app').innerHTML = html;
+document.getElementById('foot').innerHTML = `<p>The Secret Lair, ${day(W.window.from)} to ${day(W.window.to)}. Chat counts come from the message history of every channel Pebble can read; bots are left out. Voice hours come from Pebble's voice pay, so time spent alone in a call, or deafened, doesn't count. Pebbles, casino, drops, cards and games come from Pebble's own records.</p><p>Made by Pebble.</p>`;
+</script>
+</body>
+</html>
