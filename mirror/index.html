@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>The Mirror of Shame</title>
+<meta name="description" content="The Secret Lair's Mirror of Shame, Halloween 2026: every question, and who the mirror chose.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/*
+ * Two modes. STORY: full-screen slides like Spotify Wrapped — progress bars on
+ * top, tap right/left to move, hold to pause, auto-advance; one slide per
+ * question that reveals #3, #2, then #1. RESULTS: one scrolling page with every
+ * question at once. Dark Halloween duotones, same type as Lair Wrapped.
+ */
+:root {
+  color-scheme: dark;
+  --ink: #fbf8ff;
+  --ink-2: rgba(251, 248, 255, 0.8);
+  --ink-3: rgba(251, 248, 255, 0.58);
+  --base: #07060b;
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--base); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; overflow: hidden; }
+body.results-mode { overflow: auto; }
+button { font: inherit; color: inherit; }
+h1, h2, h3 { margin: 0; font-family: var(--display); text-wrap: balance; }
+
+/* ---------------------------------------------------------------- story */
+#story { position: fixed; inset: 0; display: grid; place-items: center; background: #000; }
+body.results-mode #story { display: none; }
+.frame { position: relative; width: min(100vw, calc(100dvh * 9 / 16)); height: 100dvh; overflow: hidden; background: var(--bg, #1a0612); touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+@media (min-width: 700px) { .frame { height: min(100dvh, 920px); width: min(100vw, 518px); border-radius: 22px; box-shadow: 0 30px 120px rgba(0,0,0,.6); } }
+.slide { position: absolute; inset: 0; display: grid; align-content: safe center; gap: 22px; padding: 86px max(24px, env(safe-area-inset-left, 0px)) 70px; opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+.slide.on { opacity: 1; pointer-events: auto; }
+.slide::before { content: ""; position: absolute; inset: -30% -30%; z-index: 0; background:
+  radial-gradient(40% 35% at 80% 15%, color-mix(in oklab, var(--hot) 60%, transparent), transparent 70%),
+  radial-gradient(45% 40% at 10% 90%, color-mix(in oklab, var(--cool) 65%, transparent), transparent 70%);
+  animation: drift 14s ease-in-out infinite alternate; }
+.slide > * { position: relative; z-index: 1; }
+@keyframes drift { from { transform: translate(-3%, -2%) rotate(0deg); } to { transform: translate(3%, 3%) rotate(8deg); } }
+
+.bars { position: absolute; z-index: 5; top: max(12px, env(safe-area-inset-top, 0px)); left: 12px; right: 12px; display: flex; gap: 4px; }
+.bars i { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.28); overflow: hidden; }
+.bars i b { display: block; height: 100%; width: 0; background: #fff; }
+.top { position: absolute; z-index: 6; top: calc(max(12px, env(safe-area-inset-top, 0px)) + 14px); left: 14px; right: 10px; display: flex; align-items: center; justify-content: space-between; }
+.brand { font: 700 12px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.skip { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.paused { position: absolute; z-index: 6; inset: auto 0 22px; text-align: center; font-size: 13px; color: var(--ink-3); opacity: 0; transition: opacity .2s; }
+.frame.is-paused .paused { opacity: 1; }
+.hint { position: absolute; z-index: 6; inset: auto 0 22px; text-align: center; font-size: 13px; color: var(--ink-3); }
+
+.kicker { font: 700 12px/1.2 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--hot); }
+.mega { font: 900 clamp(40px, 13vw, 66px)/.95 var(--display); letter-spacing: -.03em; }
+.q { font: 800 clamp(24px, 7.2vw, 36px)/1.08 var(--display); letter-spacing: -.02em; }
+.lead { font-size: clamp(16px, 4.4vw, 19px); color: var(--ink-2); margin: 0; }
+.quip { font-size: clamp(16px, 4.6vw, 20px); font-style: italic; color: var(--ink); margin: 0; }
+
+/* Staged reveal: each piece has a delay (--d) and pops in when its slide is shown. */
+.st { opacity: 0; transform: translateY(18px) scale(.98); }
+.slide.on .st { animation: rise .6s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: var(--d, 0s); }
+.slide.on.held .st { animation-play-state: paused; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+.slide.on .pop { animation: pop .8s cubic-bezier(.2,1.4,.3,1) forwards; animation-delay: var(--d, 0s); }
+@keyframes pop { 0% { opacity: 0; transform: scale(.6) rotate(-4deg); } 100% { opacity: 1; transform: none; } }
+
+.podium { display: grid; gap: 10px; }
+.row { display: grid; grid-template-columns: 34px 46px 1fr auto; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 16px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); min-width: 0; }
+.row .rk { font: 900 18px/1 var(--display); color: var(--ink-3); }
+.row .nm { font: 700 16px/1.15 var(--display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.row .v { font: 700 14px var(--display); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.win { display: grid; justify-items: center; text-align: center; gap: 12px; padding: 22px 16px 18px; border-radius: 24px; background: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.22); position: relative; }
+.win .crown { position: absolute; top: -26px; font-size: 40px; filter: drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+.win .nm { font: 900 clamp(24px, 7.5vw, 34px)/1.05 var(--display); overflow-wrap: anywhere; }
+.win .v { font: 700 15px var(--display); color: var(--hot); }
+.win.tie { padding-top: 26px; }
+.tiewrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 18px; }
+.tiewrap > div { display: grid; justify-items: center; gap: 8px; max-width: 120px; }
+.tiewrap .nm { font-size: 17px; }
+
+.av { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex: none; background: color-mix(in oklab, var(--hot) 45%, var(--bg)); display: grid; place-items: center; font: 700 17px/1 var(--display); }
+.av.xl { width: 116px; height: 116px; font-size: 40px; box-shadow: 0 0 0 4px var(--bg), 0 0 0 7px var(--hot), 0 12px 40px rgba(0,0,0,.5); }
+.av.lg { width: 84px; height: 84px; font-size: 28px; box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--hot); }
+
+.nums { display: grid; gap: 18px; }
+.nums div { border-top: 3px solid var(--hot); padding-top: 10px; }
+.nums b { display: block; font: 900 clamp(40px, 12vw, 60px)/1 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.nums span { color: var(--ink-2); }
+.cta { justify-self: start; background: var(--ink); color: #0b0a10; border: 0; border-radius: 999px; padding: 14px 22px; font: 700 15px var(--display); cursor: pointer; }
+.cta.ghost { background: transparent; color: var(--ink); border: 1px solid rgba(255,255,255,.35); }
+.ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+.cta.start { font-size: 17px; padding: 16px 26px; margin-top: 6px; }
+.slide.on .cta.start { animation: rise .6s cubic-bezier(.2,.8,.2,1) var(--d, 0s) forwards, glow 2.2s ease-in-out 3.4s infinite; }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--hot) 60%, transparent); } 50% { box-shadow: 0 0 0 12px transparent; } }
+
+/* ---------------------------------------------------------------- results */
+#results { display: none; }
+body.results-mode #results { display: block; }
+.band { --bg: #1b0612; --hot: #ff3d6e; --cool: #6a1fb8; position: relative; overflow: hidden; background: var(--bg); }
+.band::before { content: ""; position: absolute; inset: -20% -10%; pointer-events: none; background:
+  radial-gradient(40% 50% at 85% 10%, color-mix(in oklab, var(--hot) 50%, transparent), transparent 70%),
+  radial-gradient(45% 55% at 5% 95%, color-mix(in oklab, var(--cool) 55%, transparent), transparent 70%); }
+.inner { position: relative; max-width: 1180px; margin: 0 auto; padding: 64px max(18px, env(safe-area-inset-left, 0px)) 72px; display: grid; gap: 30px; }
+.inner h1 { font-size: clamp(38px, 8vw, 96px); font-weight: 900; line-height: .95; letter-spacing: -.03em; }
+.inner h2 { font-size: clamp(26px, 4.4vw, 48px); font-weight: 900; line-height: 1; }
+.big { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 22px 30px; }
+.big > div { border-top: 3px solid var(--hot); padding-top: 12px; }
+.big b { display: block; font: 900 clamp(34px, 4.4vw, 54px)/1 var(--display); font-variant-numeric: tabular-nums; }
+.big span { color: var(--ink-2); font-size: 15px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; align-items: start; }
+.card { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: 20px; padding: 20px; display: grid; gap: 12px; min-width: 0; }
+.card .lbl { font: 700 11.5px/1.3 var(--display); text-transform: uppercase; letter-spacing: .12em; color: var(--hot); }
+.card .qq { font-size: 15px; color: var(--ink-2); margin: 0; }
+.card .w { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.card .w .nm { font: 700 18px/1.15 var(--display); overflow-wrap: anywhere; }
+.card .w .v { font-size: 13.5px; color: var(--ink-3); }
+.card .w .av { width: 54px; height: 54px; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--hot); }
+.card ol { list-style: none; margin: 0; padding: 10px 0 0; border-top: 1px solid rgba(255,255,255,.12); display: grid; gap: 7px; }
+.card ol li { display: grid; grid-template-columns: 18px 24px 1fr auto; align-items: center; gap: 9px; font-size: 14px; color: var(--ink-2); }
+.card ol li .av { width: 24px; height: 24px; font-size: 10px; }
+.card ol li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.card ol li .r { font: 700 11px var(--display); color: var(--ink-3); }
+.card .tieline { font-size: 13px; color: var(--ink-3); margin: 0; }
+.hall { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+footer.inner { padding-block: 34px 56px; color: var(--ink-3); font-size: 14px; gap: 8px; }
+footer p { margin: 0; }
+.replay { position: fixed; z-index: 10; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
+
+.tiewrap .av.lg { width: 66px; height: 66px; font-size: 24px; }
+
+/* #1 behind a card: tap it (or anywhere on the right) to reveal. */
+.cover { display: grid; justify-items: center; gap: 6px; padding: 26px 16px 22px; border-radius: 24px; border: 2px dashed color-mix(in oklab, var(--hot) 75%, white); background: rgba(255,255,255,.06); cursor: pointer; text-align: center; width: 100%; }
+.cover .qm { font: 900 64px/1 var(--display); color: var(--hot); text-shadow: 0 0 28px color-mix(in oklab, var(--hot) 70%, transparent); }
+.slide.on .cover .qm { animation: throb 1.4s ease-in-out infinite; }
+@keyframes throb { 50% { transform: scale(1.12); text-shadow: 0 0 48px var(--hot); } }
+.cover .ct { font: 800 20px/1.1 var(--display); }
+.cover .tap { font: 700 12px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.reveal-win { display: none; }
+.slide.revealed .cover { display: none; }
+.slide.revealed .reveal-win { display: grid; animation: pop .9s cubic-bezier(.2,1.4,.3,1) both; }
+.slide.revealed .reveal-win .crown { animation: crown 1s cubic-bezier(.2,1.6,.3,1) .25s both; }
+@keyframes crown { from { opacity: 0; transform: translateY(-40px) rotate(-25deg) scale(.4); } to { opacity: 1; transform: none; } }
+.after { opacity: 0; transform: translateY(18px); }
+.slide.revealed .after { animation: rise .6s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: var(--d, 0s); }
+.slide.held .after, .slide.held .reveal-win { animation-play-state: paused; }
+/* Tapped before #3/#2 finished arriving: everything up to the card shows at once. */
+.slide.fast .st { animation-duration: .15s !important; animation-delay: 0s !important; }
+.flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(circle at 50% 60%, color-mix(in oklab, var(--hot) 60%, white), transparent 60%); opacity: 0; }
+.slide.revealed .flash { animation: flash .7s ease-out; }
+@keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
+/* Short phones (iPhone SE and the like): tighter spacing, smaller pieces, so a slide never spills. */
+@media (max-height: 720px) {
+  .slide { gap: 14px; padding-top: 70px; padding-bottom: 54px; }
+  .q { font-size: clamp(20px, 6vw, 28px); }
+  .mega { font-size: clamp(34px, 11vw, 52px); }
+  .av.xl { width: 86px; height: 86px; font-size: 30px; }
+  .tiewrap .av.lg { width: 54px; height: 54px; font-size: 20px; }
+  .win { padding: 16px 12px 14px; gap: 8px; }
+  .row { padding: 7px 12px; }
+  .row .av { width: 36px; height: 36px; }
+  .nums { gap: 12px; }
+  .nums b { font-size: clamp(32px, 10vw, 46px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide::before { animation: none; }
+  .slide.on .st, .slide.on .pop { animation: none; opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<div id="story">
+  <div class="frame" id="frame">
+    <div class="bars" id="bars"></div>
+    <div class="top"><span class="brand">🪞 The Mirror of Shame</span><button class="skip" id="skip" type="button">See all results</button></div>
+    <div id="slides"></div>
+    <div class="paused">Paused</div>
+  </div>
+</div>
+<div id="results"></div>
+
+<script>
+const D = {"generatedAt":1793565775688,"totals":{"questions":24,"votes":425,"voters":23,"nominated":33},"questions":[{"n":1,"qid":"validation","q":"Who do you think flirts with everyone just for validation?","label":"Flirts for validation","votes":22,"ranked":[{"id":"459455078982483975","v":10},{"id":"1078039211413864518","v":3},{"id":"1357793223103484125","v":2},{"id":"1531401125826138173","v":2},{"id":"1097921188765892719","v":1},{"id":"800939279495725067","v":1},{"id":"704384670107959377","v":1},{"id":"1158633440497909822","v":1},{"id":"1557091816552276102","v":1}]},{"n":2,"qid":"abandon","q":"Who do you think would abandon their best friend for someone they're attracted to?","label":"Would ditch their best friend","votes":20,"ranked":[{"id":"1158633440497909822","v":5},{"id":"1395868079971504314","v":4},{"id":"1531401125826138173","v":2},{"id":"1097921188765892719","v":2},{"id":"1507436631198797854","v":1},{"id":"1557091816552276102","v":1},{"id":"1452066807153295461","v":1},{"id":"459455078982483975","v":1},{"id":"1393566139526676593","v":1},{"id":"1171171547524898937","v":1},{"id":"1078039211413864518","v":1}]},{"n":3,"qid":"enjoysfail","q":"Who do you think secretly enjoys seeing other members fail?","label":"Enjoys others failing","votes":20,"ranked":[{"id":"1158633440497909822","v":6},{"id":"704384670107959377","v":5},{"id":"1109447484872347760","v":3},{"id":"1097921188765892719","v":2},{"id":"1557091816552276102","v":1},{"id":"1171171547524898937","v":1},{"id":"1531401125826138173","v":1},{"id":"1498447725434503269","v":1}]},{"n":4,"qid":"cheat","q":"Who do you think would cheat if they knew they'd never get caught?","label":"Would cheat","votes":19,"ranked":[{"id":"1557091816552276102","v":6},{"id":"1078039211413864518","v":3},{"id":"1357793223103484125","v":2},{"id":"1109447484872347760","v":2},{"id":"1393566139526676593","v":1},{"id":"1507436631198797854","v":1},{"id":"1395868079971504314","v":1},{"id":"1097921188765892719","v":1},{"id":"704384670107959377","v":1},{"id":"1158633440497909822","v":1}]},{"n":5,"qid":"friendsex","q":"Who do you think would date their friend's ex?","label":"Would date a friend's ex","votes":19,"ranked":[{"id":"1557091816552276102","v":4},{"id":"1357793223103484125","v":2},{"id":"1158633440497909822","v":2},{"id":"734444708922654750","v":2},{"id":"1452066807153295461","v":1},{"id":"1395868079971504314","v":1},{"id":"459455078982483975","v":1},{"id":"1531401125826138173","v":1},{"id":"1109447484872347760","v":1},{"id":"1171171547524898937","v":1},{"id":"704384670107959377","v":1},{"id":"1257185526813823049","v":1},{"id":"1097921188765892719","v":1}]},{"n":6,"qid":"popularfriends","q":"Who do you think is only popular because of who they're friends with?","label":"Popular by association","votes":19,"ranked":[{"id":"1097921188765892719","v":4},{"id":"1507436631198797854","v":3},{"id":"1531401125826138173","v":2},{"id":"1109447484872347760","v":2},{"id":"800939279495725067","v":2},{"id":"1158633440497909822","v":1},{"id":"1557091816552276102","v":1},{"id":"734444708922654750","v":1},{"id":"704384670107959377","v":1},{"id":"979406784076861520","v":1},{"id":"1452066807153295461","v":1}]},{"n":7,"qid":"jealous","q":"Who do you think is secretly jealous of their friends?","label":"Secretly jealous","votes":18,"ranked":[{"id":"1171171547524898937","v":7},{"id":"1158633440497909822","v":5},{"id":"1557091816552276102","v":1},{"id":"1076635120397713520","v":1},{"id":"704384670107959377","v":1},{"id":"1107365174974894131","v":1},{"id":"1097921188765892719","v":1},{"id":"1452066807153295461","v":1}]},{"n":8,"qid":"overrated","q":"Who do you think is the most overrated person in the server?","label":"Most overrated","votes":19,"ranked":[{"id":"979406784076861520","v":4},{"id":"1097921188765892719","v":3},{"id":"1531401125826138173","v":3},{"id":"1158633440497909822","v":2},{"id":"459455078982483975","v":2},{"id":"1557091816552276102","v":1},{"id":"1078039211413864518","v":1},{"id":"1357793223103484125","v":1},{"id":"1217419914520821772","v":1},{"id":"407065222579355660","v":1}]},{"n":9,"qid":"ego","q":"Who do you think has the biggest ego without anything to back it up?","label":"Biggest ego","votes":19,"ranked":[{"id":"1171171547524898937","v":6},{"id":"1158633440497909822","v":6},{"id":"1531401125826138173","v":2},{"id":"1557091816552276102","v":1},{"id":"704384670107959377","v":1},{"id":"1199113291415421098","v":1},{"id":"1030448326660849695","v":1},{"id":"963733383253471243","v":1}]},{"n":10,"qid":"hiding","q":"Who do you think is hiding the most from everyone?","label":"Hiding the most","votes":19,"ranked":[{"id":"1531401125826138173","v":5},{"id":"1158633440497909822","v":3},{"id":"1171171547524898937","v":2},{"id":"704384670107959377","v":2},{"id":"800939279495725067","v":1},{"id":"1395868079971504314","v":1},{"id":"767702872300847114","v":1},{"id":"1311625931638571043","v":1},{"id":"1507436631198797854","v":1},{"id":"1069581333694795828","v":1},{"id":"1354996225291587594","v":1}]},{"n":11,"qid":"obsessed","q":"Who do you think is secretly obsessed with someone in this server?","label":"Secretly obsessed","votes":19,"ranked":[{"id":"1171171547524898937","v":6},{"id":"1531401125826138173","v":5},{"id":"459455078982483975","v":2},{"id":"979406784076861520","v":2},{"id":"1557091816552276102","v":1},{"id":"734444708922654750","v":1},{"id":"1452066807153295461","v":1},{"id":"800939279495725067","v":1}]},{"n":12,"qid":"nosecret","q":"Who would you never trust with a personal secret?","label":"Can't keep a secret","votes":18,"ranked":[{"id":"1171171547524898937","v":4},{"id":"1097921188765892719","v":2},{"id":"1158633440497909822","v":2},{"id":"1076635120397713520","v":1},{"id":"1030448326660849695","v":1},{"id":"1557091816552276102","v":1},{"id":"1109447484872347760","v":1},{"id":"1531401125826138173","v":1},{"id":"1395868079971504314","v":1},{"id":"1107365174974894131","v":1},{"id":"963733383253471243","v":1},{"id":"979406784076861520","v":1},{"id":"1078039211413864518","v":1}]},{"n":13,"qid":"fakest","q":"Who do you think is the fakest person here?","label":"The fakest","votes":14,"ranked":[{"id":"1158633440497909822","v":3},{"id":"1171171547524898937","v":2},{"id":"1452066807153295461","v":1},{"id":"1109447484872347760","v":1},{"id":"1557091816552276102","v":1},{"id":"1097921188765892719","v":1},{"id":"459455078982483975","v":1},{"id":"1507436631198797854","v":1},{"id":"343718330416496641","v":1},{"id":"773115863099768843","v":1},{"id":"1357793223103484125","v":1}]},{"n":14,"qid":"exposedms","q":"Who do you think would expose private messages after an argument?","label":"Would expose DMs","votes":15,"ranked":[{"id":"1171171547524898937","v":3},{"id":"1097921188765892719","v":3},{"id":"1452066807153295461","v":3},{"id":"1158633440497909822","v":2},{"id":"1507436631198797854","v":1},{"id":"1557091816552276102","v":1},{"id":"1395868079971504314","v":1},{"id":"1311625931638571043","v":1}]},{"n":15,"qid":"screenshots","q":"Who do you think secretly keeps screenshots to use against people later?","label":"Keeps screenshots","votes":17,"ranked":[{"id":"1452066807153295461","v":5},{"id":"1171171547524898937","v":3},{"id":"1158633440497909822","v":2},{"id":"704384670107959377","v":2},{"id":"1097921188765892719","v":2},{"id":"1557091816552276102","v":1},{"id":"1107365174974894131","v":1},{"id":"1357793223103484125","v":1}]},{"n":16,"qid":"usenice","q":"Who do you think is only nice to people when they need something?","label":"Only nice when they need something","votes":16,"ranked":[{"id":"1158633440497909822","v":6},{"id":"1452066807153295461","v":4},{"id":"1171171547524898937","v":1},{"id":"1557091816552276102","v":1},{"id":"1097921188765892719","v":1},{"id":"704384670107959377","v":1},{"id":"1030448326660849695","v":1},{"id":"459455078982483975","v":1}]},{"n":17,"qid":"secretdate","q":"Who would you secretly date but never admit publicly?","label":"Would secretly date","votes":17,"ranked":[{"id":"1357793223103484125","v":4},{"id":"1452066807153295461","v":2},{"id":"1097921188765892719","v":2},{"id":"1395868079971504314","v":1},{"id":"1158633440497909822","v":1},{"id":"979406784076861520","v":1},{"id":"1311625931638571043","v":1},{"id":"704384670107959377","v":1},{"id":"1393566139526676593","v":1},{"id":"1109447484872347760","v":1},{"id":"1171171547524898937","v":1},{"id":"1557091816552276102","v":1}]},{"n":18,"qid":"dislike","q":"Who in this server do you secretly dislike but pretend to like?","label":"Secretly disliked","votes":16,"ranked":[{"id":"1452066807153295461","v":4},{"id":"1557091816552276102","v":2},{"id":"1097921188765892719","v":1},{"id":"1076635120397713520","v":1},{"id":"1531401125826138173","v":1},{"id":"704384670107959377","v":1},{"id":"459455078982483975","v":1},{"id":"1393566139526676593","v":1},{"id":"1507436631198797854","v":1},{"id":"1158633440497909822","v":1},{"id":"963733383253471243","v":1},{"id":"1357793223103484125","v":1}]},{"n":19,"qid":"situationship","q":"Who do you think is hiding a situationship from everyone?","label":"Hiding a situationship","votes":17,"ranked":[{"id":"1097921188765892719","v":3},{"id":"979406784076861520","v":3},{"id":"1452066807153295461","v":2},{"id":"1531401125826138173","v":2},{"id":"1171171547524898937","v":2},{"id":"1217419914520821772","v":1},{"id":"1557091816552276102","v":1},{"id":"704384670107959377","v":1},{"id":"1395868079971504314","v":1},{"id":"1158633440497909822","v":1}]},{"n":20,"qid":"takencrush","q":"Who do you think secretly has feelings for someone who's already taken?","label":"Feelings for someone taken","votes":16,"ranked":[{"id":"1531401125826138173","v":3},{"id":"1395868079971504314","v":3},{"id":"1078039211413864518","v":2},{"id":"704384670107959377","v":1},{"id":"1158633440497909822","v":1},{"id":"1557091816552276102","v":1},{"id":"1109447484872347760","v":1},{"id":"1164219423142465738","v":1},{"id":"1097921188765892719","v":1},{"id":"1171171547524898937","v":1},{"id":"1076635120397713520","v":1}]},{"n":21,"qid":"victim","q":"Who do you think has the biggest victim complex?","label":"Biggest victim complex","votes":16,"ranked":[{"id":"1171171547524898937","v":3},{"id":"1078039211413864518","v":2},{"id":"1395868079971504314","v":2},{"id":"1158633440497909822","v":2},{"id":"1097921188765892719","v":1},{"id":"1507436631198797854","v":1},{"id":"1557091816552276102","v":1},{"id":"704384670107959377","v":1},{"id":"1030448326660849695","v":1},{"id":"1452066807153295461","v":1},{"id":"1357793223103484125","v":1}]},{"n":22,"qid":"enemycrush","q":"Who do you think is secretly attracted to someone they publicly dislike?","label":"Into their \"enemy\"","votes":17,"ranked":[{"id":"1158633440497909822","v":9},{"id":"459455078982483975","v":2},{"id":"1097921188765892719","v":2},{"id":"704384670107959377","v":1},{"id":"1311625931638571043","v":1},{"id":"1171171547524898937","v":1},{"id":"1357793223103484125","v":1}]},{"n":23,"qid":"betraypartner","q":"Who do you think would betray their partner to protect their reputation?","label":"Would betray their partner","votes":16,"ranked":[{"id":"1158633440497909822","v":5},{"id":"1171171547524898937","v":2},{"id":"1395868079971504314","v":2},{"id":"1217419914520821772","v":1},{"id":"1393566139526676593","v":1},{"id":"1557091816552276102","v":1},{"id":"1257185526813823049","v":1},{"id":"459455078982483975","v":1},{"id":"1452066807153295461","v":1},{"id":"1357793223103484125","v":1}]},{"n":24,"qid":"chameleon","q":"Who do you think changes their personality depending on who's around?","label":"Changes with the room","votes":17,"ranked":[{"id":"704384670107959377","v":3},{"id":"1452066807153295461","v":3},{"id":"1109447484872347760","v":2},{"id":"1158633440497909822","v":2},{"id":"1357793223103484125","v":2},{"id":"1076635120397713520","v":1},{"id":"1557091816552276102","v":1},{"id":"1171171547524898937","v":1},{"id":"459455078982483975","v":1},{"id":"1257185526813823049","v":1}]}],"crowns":[{"id":"1158633440497909822","c":7},{"id":"1171171547524898937","c":6},{"id":"1452066807153295461","c":4},{"id":"1097921188765892719","c":3},{"id":"1557091816552276102","c":2},{"id":"979406784076861520","c":2},{"id":"1531401125826138173","c":2},{"id":"459455078982483975","c":1},{"id":"1357793223103484125","c":1},{"id":"1395868079971504314","c":1},{"id":"704384670107959377","c":1}],"mentions":[{"id":"1158633440497909822","v":69},{"id":"1171171547524898937","v":48},{"id":"1097921188765892719","v":34},{"id":"1557091816552276102","v":31},{"id":"1452066807153295461","v":31},{"id":"1531401125826138173","v":30},{"id":"704384670107959377","v":25},{"id":"459455078982483975","v":23},{"id":"1357793223103484125","v":19},{"id":"1395868079971504314","v":18},{"id":"1109447484872347760","v":14},{"id":"1078039211413864518","v":13},{"id":"979406784076861520","v":12},{"id":"1507436631198797854","v":10},{"id":"800939279495725067","v":5},{"id":"1393566139526676593","v":5},{"id":"1076635120397713520","v":5},{"id":"734444708922654750","v":4},{"id":"1030448326660849695","v":4},{"id":"1311625931638571043","v":4},{"id":"1257185526813823049","v":3},{"id":"1107365174974894131","v":3},{"id":"1217419914520821772","v":3},{"id":"963733383253471243","v":3},{"id":"1498447725434503269","v":1},{"id":"407065222579355660","v":1},{"id":"1199113291415421098","v":1},{"id":"767702872300847114","v":1},{"id":"1069581333694795828","v":1},{"id":"1354996225291587594","v":1},{"id":"343718330416496641","v":1},{"id":"773115863099768843","v":1},{"id":"1164219423142465738","v":1}],"people":{"459455078982483975":{"name":"Ajnabi","avatar":"https://cdn.discordapp.com/avatars/459455078982483975/ba1f2be4d174fedcab5f2dacf20a322f.png?size=256"},"1078039211413864518":{"name":"Tacos 🌮","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1078039211413864518/avatars/0c063c6ae9e7dc5afa1201a39f3c6521.png?size=256"},"1357793223103484125":{"name":"Zaytoona","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1357793223103484125/avatars/b5f0e4199bdabf3c28e71a162357962d.png?size=256"},"1531401125826138173":{"name":"Batata","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1531401125826138173/avatars/a_0a25c02283affc5bb261176f4cb320fd.png?size=256"},"1097921188765892719":{"name":"m3z","avatar":"https://cdn.discordapp.com/avatars/1097921188765892719/c7311db5cafc947642337622717ca077.png?size=256"},"800939279495725067":{"name":"sherry","avatar":"https://cdn.discordapp.com/avatars/800939279495725067/59f42a398b160ae37b5fedee8121efbd.png?size=256"},"704384670107959377":{"name":"Cas","avatar":"https://cdn.discordapp.com/avatars/704384670107959377/b2d0ff48e1cf14e621d0fd75a91b5143.png?size=256"},"1158633440497909822":{"name":"✰𝒍𝒆𝒆𝒏𝒂✰","avatar":"https://cdn.discordapp.com/avatars/1158633440497909822/384880b9225d4a13e479edaa23b3ec87.png?size=256"},"1557091816552276102":{"name":"Hummus","avatar":"https://cdn.discordapp.com/avatars/1557091816552276102/ea1ee2bd2702641a1c01d183b7de54aa.png?size=256"},"1395868079971504314":{"name":"Anna","avatar":"https://cdn.discordapp.com/avatars/1395868079971504314/e20cc0857389f6700ed6903369106572.png?size=256"},"1507436631198797854":{"name":"˚₊‧ HΛLΞY‧₊˚","avatar":"https://cdn.discordapp.com/avatars/1507436631198797854/bf4742e4f269472b3154d3ac57a769af.png?size=256"},"1452066807153295461":{"name":"Jeon","avatar":"https://cdn.discordapp.com/avatars/1452066807153295461/178ef59febb746892a38e18847c270a8.png?size=256"},"1393566139526676593":{"name":"Lafloofi","avatar":"https://cdn.discordapp.com/avatars/1393566139526676593/2206abb00da666fc2dbe94c2c7b3aa47.png?size=256"},"1171171547524898937":{"name":"𝓡𝓸𝓴𝓪⭑","avatar":"https://cdn.discordapp.com/avatars/1171171547524898937/404a30031a1f226e49075e2514e764c2.png?size=256"},"1109447484872347760":{"name":"Aurora","avatar":"https://cdn.discordapp.com/avatars/1109447484872347760/f4a564e01734e607acd1a0b4eb128f55.png?size=256"},"1498447725434503269":{"name":"Abrar","avatar":"https://cdn.discordapp.com/avatars/1498447725434503269/cb5792148fe2bddd8ebd8a35395f2c70.png?size=256"},"734444708922654750":{"name":"Aze","avatar":"https://cdn.discordapp.com/avatars/734444708922654750/83f9d0b6aac7b40e734bc48d1adb9baf.png?size=256"},"1257185526813823049":{"name":"poetryifitwasaman","avatar":"https://cdn.discordapp.com/avatars/1257185526813823049/322d836b5348a2c7ae7e3a18dff46f17.png?size=256"},"979406784076861520":{"name":"Mathyess","avatar":"https://cdn.discordapp.com/avatars/979406784076861520/ca8a3230ad97c4dd622999b7ac39098d.png?size=256"},"1076635120397713520":{"name":"𝓟𝓻𝓮𝓼𝓱𝔂𝔃","avatar":"https://cdn.discordapp.com/avatars/1076635120397713520/104c35518bbe1d0a1f5a450573158f74.png?size=256"},"1107365174974894131":{"name":"-Flash","avatar":"https://cdn.discordapp.com/avatars/1107365174974894131/cc1a0cd08ebc0fb352a9cefacb417fba.png?size=256"},"1217419914520821772":{"name":"Adam","avatar":"https://cdn.discordapp.com/avatars/1217419914520821772/9957365d6b5254d8d81273ce286f7fe6.png?size=256"},"407065222579355660":{"name":"Ben 10⌚","avatar":null},"1199113291415421098":{"name":"Walid","avatar":"https://cdn.discordapp.com/avatars/1199113291415421098/4df1576d2e52209a56ab0030890c755a.png?size=256"},"1030448326660849695":{"name":"Dodi🪱","avatar":"https://cdn.discordapp.com/avatars/1030448326660849695/7cf0382443dd3a6fbadcccbac409ab1d.png?size=256"},"963733383253471243":{"name":"Shibby","avatar":"https://cdn.discordapp.com/avatars/963733383253471243/118e651c841f9c62471d0c74b9e82c44.png?size=256"},"767702872300847114":{"name":"pearl","avatar":"https://cdn.discordapp.com/avatars/767702872300847114/ea016793ada11b01fe811570dd0aca37.png?size=256"},"1311625931638571043":{"name":"Gina","avatar":"https://cdn.discordapp.com/avatars/1311625931638571043/b26c8948aa69111e292b8b60d0d1dc5d.png?size=256"},"1069581333694795828":{"name":"Hasnain Jaffery","avatar":"https://cdn.discordapp.com/avatars/1069581333694795828/0d34645288f1faf0e69abad28678b292.png?size=256"},"1354996225291587594":{"name":"Chainsmoker","avatar":"https://cdn.discordapp.com/avatars/1354996225291587594/a9b890d86a72ed50a56a2740ee4b0bb9.png?size=256"},"343718330416496641":{"name":"Cute bhai💗","avatar":"https://cdn.discordapp.com/avatars/343718330416496641/4de1c46ef1c619cd3adfc9a21b4286be.png?size=256"},"773115863099768843":{"name":"🌸 Princess Jasmine 🌸","avatar":"https://cdn.discordapp.com/avatars/773115863099768843/741f7778ab4394bdd36f9202f4abd82b.png?size=256"},"1164219423142465738":{"name":"᥅ꪖᦓᦓꪗ~","avatar":"https://cdn.discordapp.com/avatars/1164219423142465738/82b81f0ba70f6e9bda042da564cbf56c.png?size=256"}}};
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = (n) => Math.round(n).toLocaleString('en-US');
+const P = (id) => D.people[id] ?? { name: 'someone', avatar: null };
+const initial = (name) => [...String(name).replace(/[^\p{L}\p{N}]/gu, '')][0]?.toUpperCase() ?? '?';
+function av(id, cls = '') {
+  const p = P(id);
+  return p.avatar
+    ? `<img class="av ${cls}" src="${esc(p.avatar)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;av ${cls}&quot;>${esc(initial(p.name))}</span>'">`
+    : `<span class="av ${cls}">${esc(initial(p.name))}</span>`;
+}
+const votes = (n) => `${fmt(n)} vote${n === 1 ? '' : 's'}`;
+
+// The winner's line for each question. {name} is the person (or "These {n}" on a tie).
+const QUIPS = {
+  dislike: 'Smiling in chat. Plotting in the DMs. Allegedly.',
+  secretdate: 'The server ships it. {name} denies it. The mirror remembers.',
+  fakest: 'A performance worthy of an award. This is the award.',
+  cheat: 'Never caught. Only… nominated.',
+  enemycrush: '"I can\'t stand them" — {name}, blushing.',
+  victim: 'Somehow, this slide is also someone else\'s fault.',
+  usenice: '"Heyyy bestie 🥺" — {name}, one second before asking for pebbles.',
+  takencrush: 'Taken? {name} reads that as a challenge.',
+  overrated: 'Main character energy. Supporting-role reviews.',
+  exposedms: 'Screenshot. Crop. Post. {name}\'s favourite workflow.',
+  validation: '{name} would flirt with a drop if it typed back.',
+  jealous: 'Happy for you. Visibly. Painfully. Happy for you.',
+  nosecret: 'Tell {name} a secret and the whole server knows by dinner.',
+  friendsex: 'For {name}, the friend code is more of a friend suggestion.',
+  chameleon: 'A different personality for every voice channel.',
+  enjoysfail: 'Every lost drop is a little gift for {name}.',
+  situationship: '"We\'re just friends" — {name}, lying with confidence.',
+  abandon: 'Best friend? {name} calls it a temporary position.',
+  ego: '{name} read this and said "finally, some recognition."',
+  screenshots: 'Somewhere there\'s a folder. {name} calls it "evidence".',
+  popularfriends: '{name}\'s best skill? Picking the right group chat.',
+  obsessed: '{name} has your online status memorised.',
+  betraypartner: 'Love is temporary. {name}\'s reputation is forever.',
+  hiding: 'The mirror looked twice and still couldn\'t see it all.',
+};
+function margin(q) {
+  const [a, b] = q.ranked;
+  if (!b) return 'Unanimous. The mirror didn\'t even have to think.';
+  if (a.v === b.v) return null;
+  if (a.v >= b.v * 2 && a.v >= 4) return 'Not even close. A landslide.';
+  if (a.v - b.v === 1) return 'Won by a single vote. Photo finish.';
+  return null;
+}
+
+// Each question gets its own colour pair, cycling through these.
+const THEMES = [
+  ['#1b0612', '#ff3d6e', '#6a1fb8'], ['#140a24', '#b35cff', '#ff7a2f'], ['#06190f', '#7dff6a', '#0e7a5c'],
+  ['#1f0c03', '#ff8a2a', '#c81d4a'], ['#0b0f25', '#5cc8ff', '#8a2be2'], ['#200414', '#ff4fd8', '#3a10a8'],
+  ['#130d02', '#ffd23d', '#b8261b'], ['#071a1d', '#3ff0d2', '#7a1fb0'],
+];
+const theme = (i) => { const [bg, hot, cool] = THEMES[i % THEMES.length]; return `--bg:${bg};--hot:${hot};--cool:${cool}`; };
+
+// The top group: everyone tied on the most votes.
+const topGroup = (q) => q.ranked.filter((x) => x.v === q.ranked[0].v);
+
+/* ---------------------------------------------------------------- slides */
+const T = D.totals;
+const slides = [];
+
+// The front page: it waits (no timer) until it's tapped.
+slides.push({ ms: 1, gate: true, style: theme(0), html: `
+  <div class="kicker st" style="--d:.1s">Halloween 2026 · The Secret Lair</div>
+  <h1 class="mega st" style="--d:.35s">The Mirror of Shame</h1>
+  <p class="lead st" style="--d:1s">For two days, the mirror asked questions about all of you. You answered — anonymously.</p>
+  <p class="lead st" style="--d:2s">Now it's time to see who the mirror chose.</p>
+  <button class="cta st start" style="--d:2.6s" type="button" data-act="start">▶ Look into the mirror</button>
+  <p class="hint st" style="--d:3s">Tap to go on · hold to pause · tap the ? to reveal each #1</p>` });
+
+slides.push({ ms: 7000, style: theme(5), html: `
+  <div class="kicker st" style="--d:.1s">The damage</div>
+  <div class="nums">
+    <div class="st" style="--d:.4s"><b data-count="${T.questions}">0</b><span>questions asked</span></div>
+    <div class="st" style="--d:1s"><b data-count="${T.votes}">0</b><span>anonymous votes cast</span></div>
+    <div class="st" style="--d:1.6s"><b data-count="${T.voters}">0</b><span>of you voted</span></div>
+    <div class="st" style="--d:2.2s"><b data-count="${T.nominated}">0</b><span>people got named at least once</span></div>
+  </div>
+  <p class="lead st" style="--d:3s">Nobody will ever see who voted for whom. Only the totals. Probably for the best.</p>` });
+
+D.questions.forEach((q, i) => {
+  const top = topGroup(q);
+  const rest = q.ranked.filter((x) => x.v < top[0].v).slice(0, 2);
+  const tie = top.length > 1;
+  const quip = (QUIPS[q.qid] ?? '').replace('{name}', tie ? 'These ' + top.length : P(top[0].id).name);
+  const m = margin(q);
+  const restRows = rest.slice().reverse().map((x, j) => `
+    <div class="row st" style="--d:${1.6 + j * .7}s"><span class="rk">#${q.ranked.indexOf(x) + 1}</span>${av(x.id)}<span class="nm">${esc(P(x.id).name)}</span><span class="v">${votes(x.v)}</span></div>`).join('');
+  // #1 waits behind a "tap to reveal" card; the slide holds until it's tapped.
+  const cd = 1.6 + rest.length * .7 + .3;           // when the card appears, after #3 and #2
+  const winner = tie
+    ? `<div class="win tie reveal-win"><div class="crown">👑</div>
+         <div class="kicker">A ${top.length}-way tie · ${votes(top[0].v)} each</div>
+         <div class="tiewrap">${top.slice(0, 6).map((x) => `<div>${av(x.id, 'lg')}<div class="nm">${esc(P(x.id).name)}</div></div>`).join('')}</div>
+         ${top.length > 6 ? `<div class="v">+${top.length - 6} more</div>` : ''}</div>`
+    : `<div class="win reveal-win"><div class="crown">👑</div>${av(top[0].id, 'xl')}
+         <div class="nm">${esc(P(top[0].id).name)}</div><div class="v">${votes(top[0].v)}</div></div>`;
+  slides.push({ ms: (cd + .6) * 1000, reveal: true, after: 6500, style: theme(i), html: `
+    <div class="kicker st" style="--d:.05s">Question ${q.n} of ${T.questions} · ${votes(q.votes)}</div>
+    <h2 class="q st" style="--d:.25s">${esc(q.q)}</h2>
+    <div class="podium">${restRows}${cover(cd, tie ? 'And #1 is… a tie?' : 'And #1 is…')}${winner}</div>
+    ${quip ? `<p class="quip after" style="--d:.9s">${esc(quip)}</p>` : ''}
+    ${m ? `<p class="lead after" style="--d:1.5s">${esc(m)}</p>` : ''}` });
+});
+
+/** The covered #1: a pulsing card you tap to reveal. */
+function cover(delay, text) {
+  return `<button class="cover st" style="--d:${delay}s" type="button" data-act="reveal">
+    <span class="qm">?</span><span class="ct">${esc(text)}</span><span class="tap">Tap to reveal</span></button>`;
+}
+
+// Awards over everything.
+const fav = D.crowns[0];
+if (fav) {
+  const ties = D.crowns.filter((c) => c.c === fav.c);
+  slides.push({ ms: 1900, reveal: true, after: 6500, style: theme(6), html: `
+    <div class="kicker st" style="--d:.1s">The mirror's favourite</div>
+    <p class="lead st" style="--d:.4s">One person came out on top more than anyone else.</p>
+    ${cover(1.1, 'The mirror\'s favourite is…')}
+    <div class="win reveal-win"><div class="crown">🪞</div>${av(fav.id, 'xl')}
+      <div class="nm">${esc(P(fav.id).name)}</div><div class="v">#1 on ${fav.c} question${fav.c === 1 ? '' : 's'}${ties.length > 1 ? ' (tied)' : ''}</div></div>
+    <p class="quip after" style="--d:1s">The mirror has seen a lot of you. Mostly you.</p>` });
+}
+const most = D.mentions[0];
+if (most) {
+  slides.push({ ms: 7500, style: theme(3), html: `
+    <div class="kicker st" style="--d:.1s">Most named, all questions together</div>
+    <div class="win pop" style="--d:.8s"><div class="crown">📛</div>${av(most.id, 'xl')}
+      <div class="nm">${esc(P(most.id).name)}</div><div class="v">${votes(most.v)} across the whole event</div></div>
+    <div class="podium">${D.mentions.slice(1, 4).map((x, j) => `
+      <div class="row st" style="--d:${1.8 + j * .4}s"><span class="rk">#${j + 2}</span>${av(x.id)}<span class="nm">${esc(P(x.id).name)}</span><span class="v">${votes(x.v)}</span></div>`).join('')}</div>` });
+}
+
+slides.push({ ms: 60000, style: theme(1), end: true, html: `
+  <div class="kicker st" style="--d:.1s">That's the mirror</div>
+  <h1 class="mega st" style="--d:.3s">You were all judged.</h1>
+  <p class="lead st" style="--d:1s">Thanks for playing — and for being honest. Anonymously.</p>
+  <div class="ctas st" style="--d:1.6s"><button class="cta" type="button" data-act="results">See every result</button><button class="cta ghost" type="button" data-act="replay">Watch again</button></div>` });
+
+/* ---------------------------------------------------------------- player */
+const frame = document.getElementById('frame');
+const holder = document.getElementById('slides');
+const bars = document.getElementById('bars');
+holder.innerHTML = slides.map((s) => `<section class="slide" style="${s.style}">${s.reveal ? '<div class="flash"></div>' : ''}${s.html}</section>`).join('');
+bars.innerHTML = slides.map(() => '<i><b></b></i>').join('');
+const els = [...holder.children];
+const fills = [...bars.querySelectorAll('b')];
+// elapsed: ms shown on this slide, pauses excluded. A reveal slide runs to `ms` (the
+// card is up), then WAITS; once revealed it runs `after` more ms and moves on.
+let cur = -1; let t0 = 0; let elapsed = 0; let held = false; let raf = 0;
+let revealed = false; let revealedAt = 0;
+const BEFORE = 0.6;   // share of a reveal slide's bar filled before the reveal
+
+const nowElapsed = () => elapsed + (held ? 0 : performance.now() - t0);
+/** Reveal #1 on the current slide; if #3/#2 are still arriving, show them all first. */
+function reveal() {
+  const s = slides[cur];
+  if (!s?.reveal || revealed) return false;
+  if (nowElapsed() < s.ms) {
+    els[cur].classList.add('fast');
+    elapsed = s.ms; t0 = performance.now();
+    return true;
+  }
+  revealed = true; revealedAt = nowElapsed();
+  els[cur].classList.add('revealed');
+  return true;
+}
+/** Forward: on an unrevealed slide, that means "reveal". */
+function next() {
+  if (reveal()) return;
+  show(cur + 1);
+}
+
+function countUp(el) {
+  el.querySelectorAll('[data-count]').forEach((n) => {
+    const to = Number(n.dataset.count); const start = performance.now(); const delay = 400;
+    const step = (now) => {
+      const p = Math.min(1, Math.max(0, (now - start - delay) / 1200));
+      n.textContent = fmt(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+function show(i) {
+  if (i < 0) i = 0;
+  if (i >= slides.length) return toResults();
+  els.forEach((el, k) => {
+    // Re-run the entrance animations each time a slide is shown; a revealed #1 is hidden again.
+    el.classList.remove('revealed', 'fast');
+    if (k === i) { el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); }
+    else el.classList.remove('on');
+  });
+  fills.forEach((f, k) => { f.style.width = k < i ? '100%' : '0%'; });
+  frame.style.background = getComputedStyle(els[i]).getPropertyValue('--bg');
+  cur = i; elapsed = 0; t0 = performance.now(); revealed = false; revealedAt = 0;
+  countUp(els[i]);
+}
+function tick(now) {
+  if (cur >= 0 && !held && !document.body.classList.contains('results-mode')) {
+    const s = slides[cur];
+    const e = elapsed + (now - t0);
+    if (s.gate) {
+      fills[cur].style.width = '0%';          // the front page never moves on by itself
+    } else if (s.reveal) {
+      // Before the tap the bar stops at BEFORE and waits; after it, fills the rest.
+      const pct = revealed
+        ? BEFORE + (1 - BEFORE) * Math.min(1, (e - revealedAt) / s.after)
+        : BEFORE * Math.min(1, e / s.ms);
+      fills[cur].style.width = `${pct * 100}%`;
+      if (revealed && e - revealedAt >= s.after) show(cur + 1);
+    } else {
+      fills[cur].style.width = `${Math.min(100, (e / s.ms) * 100)}%`;
+      if (e >= s.ms && !s.end) show(cur + 1);
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+function hold(on) {
+  if (on === held) return;
+  if (on) { elapsed += performance.now() - t0; } else { t0 = performance.now(); }
+  held = on;
+  frame.classList.toggle('is-paused', on);
+  els[cur]?.classList.toggle('held', on);
+}
+
+let downAt = 0; let downX = 0; let holdTimer = 0;
+frame.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('button')) return;
+  downAt = performance.now(); downX = e.clientX;
+  holdTimer = setTimeout(() => hold(true), 220);
+});
+frame.addEventListener('pointerup', (e) => {
+  if (e.target.closest('button')) return;
+  clearTimeout(holdTimer);
+  if (held) { hold(false); return; }
+  if (performance.now() - downAt > 400) return;
+  const r = frame.getBoundingClientRect();
+  if (downX - r.left < r.width * 0.3) show(cur - 1); else next();
+});
+frame.addEventListener('pointerleave', () => { clearTimeout(holdTimer); if (held) hold(false); });
+frame.addEventListener('contextmenu', (e) => e.preventDefault());
+document.addEventListener('keydown', (e) => {
+  if (document.body.classList.contains('results-mode')) return;
+  if (e.key === 'ArrowRight' || e.key === 'Enter') next();
+  else if (e.key === 'ArrowLeft') show(cur - 1);
+  else if (e.key === ' ') { e.preventDefault(); hold(!held); }
+  else if (e.key === 'Escape') toResults();
+});
+frame.addEventListener('click', (e) => {
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if (act === 'results') toResults();
+  if (act === 'replay') show(0);
+  if (act === 'reveal') reveal();
+  if (act === 'start') show(1);
+});
+document.getElementById('skip').addEventListener('click', toResults);
+
+/* ---------------------------------------------------------------- results page */
+function card(q, i) {
+  const top = topGroup(q);
+  const tie = top.length > 1;
+  const lead = top[0];
+  const others = q.ranked.filter((x) => !top.includes(x)).slice(0, 3);
+  return `<article class="card" style="${theme(i)}">
+    <div class="lbl">${esc(q.label)}</div>
+    <p class="qq">${esc(q.q)}</p>
+    <div class="w">${av(lead.id)}<div><div class="nm">${esc(P(lead.id).name)}${tie ? ` <span class="v">+${top.length - 1} tied</span>` : ''}</div><div class="v">${votes(lead.v)} of ${q.votes}</div></div></div>
+    ${tie ? `<p class="tieline">Tied with ${top.slice(1).map((x) => esc(P(x.id).name)).join(', ')}</p>` : ''}
+    ${others.length ? `<ol>${others.map((x) => `<li><span class="r">#${q.ranked.indexOf(x) + 1}</span>${av(x.id)}<span class="n">${esc(P(x.id).name)}</span><span>${x.v}</span></li>`).join('')}</ol>` : ''}
+  </article>`;
+}
+function renderResults() {
+  const crowns = D.crowns.slice(0, 6);
+  document.getElementById('results').innerHTML = `
+  <section class="band" style="${theme(0)}"><div class="inner">
+    <div class="kicker">Halloween 2026 · The Secret Lair</div>
+    <h1>The Mirror of Shame</h1>
+    <div class="big">
+      <div><b>${fmt(T.questions)}</b><span>questions</span></div>
+      <div><b>${fmt(T.votes)}</b><span>anonymous votes</span></div>
+      <div><b>${fmt(T.voters)}</b><span>people voted</span></div>
+      <div><b>${fmt(T.nominated)}</b><span>people named</span></div>
+    </div>
+  </div></section>
+  <section class="band" style="${theme(5)}"><div class="inner">
+    <h2>Every question</h2>
+    <div class="grid">${D.questions.map(card).join('')}</div>
+  </div></section>
+  <section class="band" style="${theme(6)}"><div class="inner">
+    <h2>Most crowned</h2>
+    <div class="hall">${crowns.map((c, i) => `<article class="card" style="${theme(i + 2)}"><div class="w">${av(c.id)}<div><div class="nm">${esc(P(c.id).name)}</div><div class="v">#1 on ${c.c} question${c.c === 1 ? '' : 's'}</div></div></div></article>`).join('')}</div>
+  </div></section>
+  <footer class="inner"><p>Votes were anonymous; this page only shows totals. Ties share the crown.</p>
+  <p>Made by Pebble for The Secret Lair · Halloween 2026.</p></footer>
+  <button class="cta replay" type="button" id="replay">▶ Watch the story</button>`;
+  document.getElementById('replay').addEventListener('click', () => {
+    document.body.classList.remove('results-mode'); window.scrollTo(0, 0); show(0);
+  });
+}
+let rendered = false;
+function toResults() {
+  if (!rendered) { renderResults(); rendered = true; }
+  document.body.classList.add('results-mode');
+  window.scrollTo(0, 0);
+}
+
+show(0);
+raf = requestAnimationFrame(tick);
+</script>
+</body>
+</html>
