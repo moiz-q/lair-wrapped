@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Secret Lair Wrapped</title>
-<meta name="description" content="The Secret Lair's last 50 days on Discord: who talked, who tagged who, who lived in VC, and everything Pebble saw.">
+<meta name="description" content="The Secret Lair's Discord recap, one reveal at a time.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: a vertical stack of full-width colour bands, one per chapter (chat, voice, pebbles, casino, drops, cards, rivalries, chaos), each a big headline then a wrapping grid of award cards. One deliberate look: dark, saturated duotone fields — no light theme on purpose. */
+/* Award content and the responsive reveal stage share each chapter’s palette. */
 :root {
   color-scheme: dark;
   --ink: #fbf8ff;
@@ -81,14 +81,38 @@ h2 { font-size: clamp(30px, 5.4vw, 64px); font-weight: 900; line-height: 1; lett
 .vs .score { font: 900 34px/1 var(--display); color: var(--hot); white-space: nowrap; }
 .vs .side .w { font-size: 13px; color: var(--ink-3); }
 
-nav.chapters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: rgba(11, 10, 16, 0.82); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.08); }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: rgba(11, 10, 16, 0.95); }
-nav.chapters .row { max-width: 1180px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); padding-block: 10px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-nav.chapters a { flex: none; color: var(--ink-2); text-decoration: none; font: 600 13px/1 var(--body); padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); }
-nav.chapters a:hover, nav.chapters a:focus-visible { color: var(--ink); border-color: var(--ink-2); outline: none; }
-section { scroll-margin-top: 60px; }
-footer.inner { padding-block: 40px 60px; color: var(--ink-3); font-size: 14px; gap: 10px; }
-footer p { margin: 0; max-width: 80ch; }
+[hidden] { display: none !important; }
+.story-shell { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; max-width: 1520px; margin: auto; padding: clamp(12px, 3vw, 42px); gap: 16px; }
+.story-header, .story-controls { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.story-header strong { font: 700 clamp(12px, 2vw, 17px)/1 var(--display); }
+.story-header select, .story-controls button { border: 1px solid var(--card-line); border-radius: 999px; padding: 10px 16px; background: #191625; color: var(--ink); font: 700 14px var(--body); }
+.story-header select { max-width: 55%; }
+button:not(:disabled), select { cursor: pointer; }
+button:disabled { opacity: .4; }
+:focus-visible { outline: 2px solid var(--hot, #ff7ad1); outline-offset: 4px; }
+.story-controls .next { background: var(--ink); color: var(--base); }
+.story-progress { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-variant-numeric: tabular-nums; font-size: 13px; }
+.story-progress progress { width: clamp(54px, 12vw, 150px); height: 5px; accent-color: #ff7ad1; }
+.story-stage { display: grid; align-content: center; min-height: min(60dvh, 560px); border-radius: clamp(20px, 3vw, 38px); border: 1px solid var(--card-line); }
+.story-layout { width: 100%; margin: auto; position: relative; display: grid; align-items: center; gap: clamp(24px, 5vw, 72px); padding: clamp(22px, 5vw, 74px); }
+.story-copy, .story-panel { display: grid; gap: 16px; min-width: 0; }
+.story-copy h2 { font-size: clamp(30px, 5vw, 66px); overflow-wrap: anywhere; }
+.story-copy h1 { font-size: clamp(44px, 8vw, 112px); }
+.story-panel .award { background: color-mix(in oklab, var(--bg) 70%, #ffffff 10%); }
+.story-panel .award .label { display: none; }
+.story-cover { min-height: clamp(250px, 44dvh, 440px); width: 100%; position: relative; isolation: isolate; overflow: hidden; display: grid; justify-items: center; align-content: center; gap: 8px; border: 1px solid color-mix(in oklab, var(--hot) 55%, transparent); border-radius: 26px; background: linear-gradient(145deg, color-mix(in oklab, var(--hot) 15%, var(--bg)), var(--bg)); color: var(--ink); font: 700 16px var(--body); }
+.story-cover::before, .story-cover::after { content: ""; position: absolute; width: 54%; aspect-ratio: 1; inset: 50% auto auto 50%; border: 1px solid var(--hot); border-radius: 50%; opacity: .24; transform: translate(-50%, -50%) scale(1.2); z-index: -1; }
+.story-cover::after { transform: translate(-50%, -50%) scale(1.65); opacity: .1; }
+.story-cover:hover { border-color: var(--hot); }
+.story-cover .question { font: 900 clamp(90px, 14vw, 180px)/1 var(--display); color: var(--hot); text-shadow: 0 0 55px color-mix(in oklab, var(--hot) 50%, transparent); }
+.story-reveal { animation: reveal-in .45s ease-out both; }
+@keyframes reveal-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+@media (min-width: 840px) {
+  .story-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+  .story-layout .big { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .story-stage { min-height: min(69dvh, 690px); }
+}
+@media (prefers-reduced-motion: reduce) { .story-reveal { animation: none; } }
 
 .c-intro { --bg: #22093f; --hot: #ff5ad9; --cool: #7b3dff; }
 .c-chat { --bg: #062b23; --hot: #b6f53b; --cool: #0d8f6a; }
@@ -105,14 +129,21 @@ footer p { margin: 0; max-width: 80ch; }
 </style>
 </head>
 <body>
-<nav class="chapters" aria-label="Chapters"><div class="row">
-  <a href="#chat">Chat</a><a href="#voice">Voice</a><a href="#pebbles">Pebbles</a><a href="#casino">Casino</a><a href="#drops">Drops</a><a href="#cards">Cards</a><a href="#rivals">Rivalries</a><a href="#chaos">Chaos</a>
-</div></nav>
-<main id="app"></main>
-<footer class="inner" id="foot"></footer>
+<main class="story-shell">
+  <header class="story-header">
+    <strong>The Lair, Wrapped</strong>
+    <select id="chapter" aria-label="Jump to chapter"></select>
+  </header>
+  <section id="stage" class="story-stage band" aria-label="Wrapped story"></section>
+  <nav class="story-controls" aria-label="Story controls">
+    <button id="back" type="button">← Back</button>
+    <div class="story-progress"><progress id="progress" aria-label="Story progress"></progress><span id="position"></span></div>
+    <button id="next" type="button" class="next">Start →</button>
+  </nav>
+</main>
 
 <script>
-const W = {"window":{"from":1788220800000,"to":1792872234609,"days":54},"chat":{"total":221625,"people":79,"mostMessages":[{"id":"1158633440497909822","v":20219},{"id":"1452066807153295461","v":19042},{"id":"1357793223103484125","v":17640},{"id":"1069581333694795828","v":15061},{"id":"1531401125826138173","v":14455}],"mostTagged":[{"id":"1097921188765892719","v":860},{"id":"1171171547524898937","v":742},{"id":"1531401125826138173","v":574},{"id":"1158633440497909822","v":556},{"id":"1452066807153295461","v":469}],"tagger":[{"id":"1158633440497909822","v":1000},{"id":"1452066807153295461","v":842},{"id":"1069581333694795828","v":767}],"mostRepliedTo":[{"id":"1158633440497909822","v":6308},{"id":"1531401125826138173","v":4900},{"id":"1171171547524898937","v":4761}],"crowdFavourite":[{"id":"1357793223103484125","v":1709},{"id":"1452066807153295461","v":1535},{"id":"1531401125826138173","v":1470}],"gifs":[{"id":"1109447484872347760","v":528},{"id":"734444708922654750","v":473},{"id":"1452066807153295461","v":386}],"images":[{"id":"1078039211413864518","v":552},{"id":"1357793223103484125","v":264},{"id":"734444708922654750","v":250}],"emojiFiend":[{"id":"1452066807153295461","v":6087,"fav":{"char":"😭","v":2100}},{"id":"1357793223103484125","v":5140,"fav":{"char":"😭","v":709}},{"id":"1158633440497909822","v":2921,"fav":{"char":"🤣","v":753}}],"tagPairs":[{"a":"1357793223103484125","b":"1531401125826138173","v":2550},{"a":"1097921188765892719","b":"1158633440497909822","v":2038},{"a":"1069581333694795828","b":"1452066807153295461","v":1922},{"a":"1158633440497909822","b":"1171171547524898937","v":1822},{"a":"1158633440497909822","b":"1531401125826138173","v":1776}],"convoPairs":[{"a":"1357793223103484125","b":"1531401125826138173","v":4688},{"a":"1109447484872347760","b":"1452066807153295461","v":3595},{"a":"1069581333694795828","b":"1452066807153295461","v":3252},{"a":"1158633440497909822","b":"1171171547524898937","v":3157},{"a":"1158633440497909822","b":"1531401125826138173","v":2371}],"emoji":[{"char":"😭","v":8648},{"char":"😂","v":3643},{"char":"🤣","v":2400},{"name":"emoji_38","url":"https://cdn.discordapp.com/emojis/1433448538725154886.webp?size=96","v":1189},{"name":"emoji_50","url":"https://cdn.discordapp.com/emojis/1475631838918869066.webp?size=96","v":1163},{"char":"💀","v":765},{"name":"emoji_43","url":"https://cdn.discordapp.com/emojis/1433448745281781813.webp?size=96","v":644},{"char":"😔","v":530},{"char":"💔","v":506},{"char":"😊","v":496},{"name":"emoji_58","url":"https://cdn.discordapp.com/emojis/1498289840494739486.webp?size=96","v":439},{"char":"😼","v":436}],"totalEmoji":34254,"totalGifs":3602,"channels":[{"name":"𖧧⋆main-chat","msgs":88428},{"name":"☆ shameless pebbles farming","msgs":32581},{"name":"☆ main vc","msgs":22081},{"name":"☆ yap lab","msgs":20088},{"name":"☆ music","msgs":13485}]},"stats":{"since":1788220800000,"until":1792871093058,"pebbles":{"totalEarned":986016,"topEarners":[{"id":"1452066807153295461","v":106631,"sources":{"voice":69404,"message":23692,"quest":2590,"daily_claim":5200,"drop":1245,"boost_reward":3000,"achievement":1500}},{"id":"734444708922654750","v":87771,"sources":{"voice":62358,"message":8858,"daily_claim":5400,"drop":1975,"drop_streak":40,"quest":140,"achievement":9000}},{"id":"1109447484872347760","v":75162,"sources":{"message":18884,"voice":44138,"drop":1880,"daily_claim":5760,"quest":600,"achievement":3900}},{"id":"1158633440497909822","v":74504,"sources":{"message":26752,"drop":11470,"daily_claim":5000,"voice":18992,"drop_streak":1620,"quest":2870,"achievement":7800}},{"id":"1531401125826138173","v":65209,"sources":{"voice":23268,"message":16546,"drop_streak":1200,"drop":9820,"achievement":5400,"quest":4000,"daily_claim":4975}}],"topSpenders":[{"id":"1158633440497909822","v":131250},{"id":"1171171547524898937","v":88800},{"id":"1452066807153295461","v":76800},{"id":"734444708922654750","v":72750},{"id":"1357793223103484125","v":67500}],"totalSpent":906650},"giving":{"mostSent":[{"id":"1452066807153295461","v":64308},{"id":"734444708922654750","v":53200},{"id":"1531401125826138173","v":43931},{"id":"1069581333694795828","v":39261},{"id":"1171171547524898937","v":35788}],"mostGifts":[{"id":"1107365174974894131","v":46},{"id":"343718330416496641","v":31},{"id":"1373983048005324863","v":30},{"id":"1357793223103484125","v":28},{"id":"1171171547524898937","v":18}],"topPairs":[{"a":"1452066807153295461","b":"734444708922654750","pebbles":44397,"gifts":4},{"a":"1069581333694795828","b":"1531401125826138173","pebbles":35210,"gifts":0},{"a":"734444708922654750","b":"979406784076861520","pebbles":32500,"gifts":0}],"totalSent":418864,"totalGifts":217},"daily":{"longestStreak":[{"id":"979406784076861520","v":31},{"id":"1069581333694795828","v":29},{"id":"1078039211413864518","v":29},{"id":"1097921188765892719","v":29},{"id":"1109447484872347760","v":29}],"claims":{"1109447484872347760":45,"1436376384216895648":43,"767702872300847114":37,"1069581333694795828":35,"1097921188765892719":34}},"voice":{"top":[{"id":"1452066807153295461","v":33387.33333333332},{"id":"734444708922654750","v":31521.999999999985},{"id":"1109447484872347760","v":22307.33333333332},{"id":"1531401125826138173","v":11680},{"id":"979406784076861520","v":10454},{"id":"1158633440497909822","v":10317.333333333334},{"id":"1171171547524898937","v":9061.333333333334},{"id":"767702872300847114","v":8260.666666666666}],"totalMinutes":193213.33333333328,"people":47},"casino":{"rounds":9238,"wagered":1398569,"houseKept":92346,"mostRounds":[{"id":"1395868079971504314","v":3446,"fav":"mines"},{"id":"1357793223103484125","v":1605,"fav":"mines"},{"id":"1171171547524898937","v":909,"fav":"hilo"},{"id":"1069581333694795828","v":782,"fav":"hilo"},{"id":"767702872300847114","v":677,"fav":"mines"}],"highRollers":[{"id":"1069581333694795828","v":250147},{"id":"1395868079971504314","v":246396},{"id":"1171171547524898937","v":235330}],"biggestWin":{"id":"459455078982483975","profit":9500,"game":"mines","bet":500},"luckiest":{"id":"1069581333694795828","z":1.235478494107774,"hit":164,"exp":178.95648519866913},"unluckiest":{"id":"767702872300847114","z":-1.3194632529332362,"hit":216,"exp":198.16881832048395},"bestNet":[{"id":"709094801412456520","v":141},{"id":"362206848612302848","v":-10},{"id":"1436376384216895648","v":-28}],"worstNet":[{"id":"1395868079971504314","v":-21467},{"id":"1171171547524898937","v":-16520},{"id":"459455078982483975","v":-16186}]},"drops":{"total":1518,"winners":[{"id":"1158633440497909822","v":264},{"id":"1357793223103484125","v":246},{"id":"1531401125826138173","v":225},{"id":"1171171547524898937","v":115},{"id":"1097921188765892719","v":103}],"bestStreak":[{"id":"1158633440497909822","v":10},{"id":"1531401125826138173","v":9},{"id":"1357793223103484125","v":8}],"fastest":{"id":"1531401125826138173","ms":1448,"kind":"scramble"},"people":34},"speedruns":[{"kind":"flag","id":"1531401125826138173","ms":18576},{"kind":"sequence","id":"1531401125826138173","ms":43936},{"kind":"math","id":"1531401125826138173","ms":49389},{"kind":"capital","id":"1097921188765892719","ms":51380}],"speedrunCount":2274,"cards":{"packs":7385,"mostPacks":[{"id":"1158633440497909822","v":941},{"id":"1171171547524898937","v":728},{"id":"1452066807153295461","v":582},{"id":"1357793223103484125","v":520},{"id":"734444708922654750","v":516}],"cards":9842,"mostCards":[{"id":"1158633440497909822","v":2668},{"id":"1109447484872347760","v":1124},{"id":"1531401125826138173","v":1018}],"legendaries":[{"id":"734444708922654750","v":47},{"id":"1357793223103484125","v":32},{"id":"1109447484872347760","v":25}],"specials":[{"id":"734444708922654750","v":8},{"id":"1158633440497909822","v":4},{"id":"1097921188765892719","v":2}],"comics":[{"id":"1109447484872347760","v":12},{"id":"1158633440497909822","v":12},{"id":"1531401125826138173","v":11}],"setsDone":[{"id":"1158633440497909822","v":23},{"id":"1171171547524898937","v":23},{"id":"1357793223103484125","v":23}],"totalSets":322,"firstCollection":{"id":"734444708922654750","at":1790714932233},"recyclers":[{"id":"1158633440497909822","v":248},{"id":"767702872300847114","v":163},{"id":"1452066807153295461","v":111}]},"rps":{"games":205,"topPair":{"a":"1069581333694795828","b":"1171171547524898937","games":14,"wins":{"1171171547524898937":5,"1069581333694795828":9},"draws":0},"hardestToBeat":{"id":"1076635120397713520","played":12,"won":9}},"ttt":{"games":49,"topPair":{"a":"1097921188765892719","b":"1393566139526676593","games":7,"wins":{"1097921188765892719":3,"1393566139526676593":1},"draws":3},"hardestToBeat":{"id":"1097921188765892719","played":43,"won":17}},"heists":[{"id":34,"status":"caught","real":true,"crew":["1069581333694795828","704384670107959377","767702872300847114"],"alarm":100},{"id":36,"status":"escaped","real":true,"crew":["1158633440497909822","1171171547524898937","1357793223103484125"],"alarm":30}],"heistHaul":[{"user_id":"1158633440497909822","delta":31844},{"user_id":"1171171547524898937","delta":31844},{"user_id":"1357793223103484125","delta":31844}],"jail":{"top":[{"id":"1078039211413864518","v":868.7614833333333},{"id":"362206848612302848","v":241.05193333333332},{"id":"1237484927985909842","v":120.806}],"sentences":30},"arabicFee":{"top":[{"id":"1030448326660849695","v":114},{"id":"1107365174974894131","v":79},{"id":"1097921188765892719","v":12}],"total":217},"museum":5,"poker":{"tables":10,"biggestPot":{"id":"1097921188765892719","v":2000}},"blocked":["1354996225291587594"]},"listener":{"id":"734444708922654750","hours":525.3666666666664,"msgs":5259,"ratio":10.010151640124361},"people":{"1158633440497909822":{"name":"✰𝒍𝒆𝒆𝒏𝒂✰","handle":"le3na_76","avatar":"https://cdn.discordapp.com/avatars/1158633440497909822/384880b9225d4a13e479edaa23b3ec87.png?size=128","here":true},"1452066807153295461":{"name":"Daddy Jeonson","handle":"jeon05679","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1452066807153295461/avatars/9ed738674cd92a30e04b2312ef8f6ee1.png?size=128","here":true},"1357793223103484125":{"name":"Zaytoona 🫒","handle":"volimacke","avatar":"https://cdn.discordapp.com/avatars/1357793223103484125/76d578ea5b875f93ab322518d99917e0.png?size=128","here":true},"1069581333694795828":{"name":"Hasina jaan","handle":"abujee_","avatar":"https://cdn.discordapp.com/avatars/1069581333694795828/0d34645288f1faf0e69abad28678b292.png?size=128","here":true},"1531401125826138173":{"name":"Batata m3 debth remen🥔","handle":"obsidian_sicario","avatar":"https://cdn.discordapp.com/avatars/1531401125826138173/2af8497b665190f7a76c6d76c50954ae.png?size=128","here":true},"1097921188765892719":{"name":"m3z","handle":"alex_hue4","avatar":"https://cdn.discordapp.com/avatars/1097921188765892719/c7311db5cafc947642337622717ca077.png?size=128","here":true},"1171171547524898937":{"name":"𝓡𝓸𝓴𝓪⭑","handle":"roka_y","avatar":"https://cdn.discordapp.com/avatars/1171171547524898937/404a30031a1f226e49075e2514e764c2.png?size=128","here":true},"1109447484872347760":{"name":"Aurora","handle":"__xer0_____","avatar":"https://cdn.discordapp.com/avatars/1109447484872347760/f4a564e01734e607acd1a0b4eb128f55.png?size=128","here":true},"734444708922654750":{"name":"Aze","handle":"azelax","avatar":"https://cdn.discordapp.com/avatars/734444708922654750/83f9d0b6aac7b40e734bc48d1adb9baf.png?size=128","here":true},"1078039211413864518":{"name":"Tacos 🌮","handle":"asesino3199","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1078039211413864518/avatars/0c063c6ae9e7dc5afa1201a39f3c6521.png?size=128","here":true},"1107365174974894131":{"name":"-Flash","handle":"i_hate_edaters7007","avatar":"https://cdn.discordapp.com/avatars/1107365174974894131/cc1a0cd08ebc0fb352a9cefacb417fba.png?size=128","here":true},"343718330416496641":{"name":"Cute bhai💗","handle":"silver.01_","avatar":"https://cdn.discordapp.com/avatars/343718330416496641/4de1c46ef1c619cd3adfc9a21b4286be.png?size=128","here":true},"1373983048005324863":{"name":"scarlett","handle":"realbatman.111","avatar":"https://cdn.discordapp.com/avatars/1373983048005324863/eeafdde4b50aa3876ef406bd2d4766b0.png?size=128","here":true},"979406784076861520":{"name":"Mathyess","handle":"shintoron","avatar":"https://cdn.discordapp.com/avatars/979406784076861520/ca8a3230ad97c4dd622999b7ac39098d.png?size=128","here":true},"767702872300847114":{"name":"pearl","handle":"pearl__1158","avatar":"https://cdn.discordapp.com/avatars/767702872300847114/ea016793ada11b01fe811570dd0aca37.png?size=128","here":true},"1395868079971504314":{"name":"Anna","handle":"jstsomegirlx2","avatar":"https://cdn.discordapp.com/avatars/1395868079971504314/7f4ad0d27891ed6fa64e5bedd4bec587.png?size=128","here":true},"459455078982483975":{"name":"اجنبی","handle":".rajaal","avatar":"https://cdn.discordapp.com/avatars/459455078982483975/ba1f2be4d174fedcab5f2dacf20a322f.png?size=128","here":true},"709094801412456520":{"name":"5","handle":"yeahbabyidonefuckthegameup","avatar":"https://cdn.discordapp.com/avatars/709094801412456520/61e10c19bd5c231f4d07759ae680726b.png?size=128","here":false},"362206848612302848":{"name":"haiguys","handle":"haiguys","avatar":"https://cdn.discordapp.com/avatars/362206848612302848/621b2d3442de03d5bc193fcce6ef61ac.png?size=128","here":false},"1436376384216895648":{"name":"Miko","handle":"yu_miko02","avatar":"https://cdn.discordapp.com/avatars/1436376384216895648/d9dfac7a6d5f6db7a2a127fdcd0c043f.png?size=128","here":true},"1076635120397713520":{"name":"𝓟𝓻𝓮𝓼𝓱𝔂𝔃","handle":"hsn_02","avatar":"https://cdn.discordapp.com/avatars/1076635120397713520/a_4d682c84ae99c476ee28b614bd519942.png?size=128","here":true},"1393566139526676593":{"name":"Lafloofi","handle":"ethereal.mogger","avatar":"https://cdn.discordapp.com/avatars/1393566139526676593/2206abb00da666fc2dbe94c2c7b3aa47.png?size=128","here":true},"704384670107959377":{"name":"Cute casturd","handle":"casper_71","avatar":"https://cdn.discordapp.com/avatars/704384670107959377/838b8604f0a1540e68540b6c93b90dfc.png?size=128","here":true},"1237484927985909842":{"name":"Epsilon-SYX","handle":"epsilon_syx","avatar":"https://cdn.discordapp.com/avatars/1237484927985909842/5026a570425affa983a04bc5449d93dc.png?size=128","here":false},"1030448326660849695":{"name":"Dodi 🪱","handle":"h_jz","avatar":"https://cdn.discordapp.com/avatars/1030448326660849695/7cf0382443dd3a6fbadcccbac409ab1d.png?size=128","here":true}}};
+const W = {"window":{"from":1792868400000,"to":1795535402000,"days":31,"timeZone":"Asia/Karachi","provisional":true},"chat":{"total":189098,"people":71,"mostMessages":[{"id":"1158633440497909822","v":23065},{"id":"1507436631198797854","v":15851},{"id":"800939279495725067","v":10538},{"id":"1171171547524898937","v":10432},{"id":"1531401125826138173","v":9564}],"mostTagged":[{"id":"1171171547524898937","v":612},{"id":"1158633440497909822","v":523},{"id":"1097921188765892719","v":511},{"id":"1507436631198797854","v":429},{"id":"734444708922654750","v":379}],"tagger":[{"id":"1158633440497909822","v":963},{"id":"1452066807153295461","v":508},{"id":"1069581333694795828","v":453}],"mostRepliedTo":[{"id":"1158633440497909822","v":5930},{"id":"1507436631198797854","v":4384},{"id":"1171171547524898937","v":3828}],"crowdFavourite":[{"id":"1498447725434503269","v":1984},{"id":"1158633440497909822","v":1729},{"id":"1507436631198797854","v":1577}],"gifs":[{"id":"1158633440497909822","v":315},{"id":"1507436631198797854","v":227},{"id":"1452066807153295461","v":218}],"images":[{"id":"1078039211413864518","v":602},{"id":"1452066807153295461","v":158},{"id":"734444708922654750","v":134}],"emojiFiend":[{"id":"704384670107959377","v":3098,"fav":{"char":"🤣","v":1691}},{"id":"1158633440497909822","v":3009,"fav":{"char":"🤣","v":1164}},{"id":"1078039211413864518","v":2202,"fav":{"char":"😊","v":886}}],"tagPairs":[{"a":"1507436631198797854","b":"800939279495725067","v":1418},{"a":"1357793223103484125","b":"1531401125826138173","v":1373},{"a":"1158633440497909822","b":"1171171547524898937","v":1252},{"a":"1158633440497909822","b":"800939279495725067","v":1177},{"a":"1097921188765892719","b":"1158633440497909822","v":1071}],"convoPairs":[{"a":"1158633440497909822","b":"1507436631198797854","v":3098},{"a":"1158633440497909822","b":"800939279495725067","v":2391},{"a":"1507436631198797854","b":"800939279495725067","v":2370},{"a":"1158633440497909822","b":"1171171547524898937","v":2054},{"a":"1498447725434503269","b":"1531401125826138173","v":1754}],"emoji":[{"char":"😭","v":5281},{"char":"🤣","v":5010},{"char":"😂","v":3541},{"char":"😊","v":1044},{"name":"emoji_50","url":"https://cdn.discordapp.com/emojis/1475631838918869066.webp?size=96","v":813},{"char":"💀","v":542},{"name":"emoji_38","url":"https://cdn.discordapp.com/emojis/1433448538725154886.webp?size=96","v":392},{"char":"👀","v":352},{"char":"😛","v":328},{"name":"emoji_43","url":"https://cdn.discordapp.com/emojis/1433448745281781813.webp?size=96","v":321},{"name":"emoji_43","url":"https://cdn.discordapp.com/emojis/1486106890420224030.webp?size=96","v":305},{"char":"😔","v":272}],"totalEmoji":25991,"totalGifs":2294,"channels":[{"name":"𖧧⋆main-chat","msgs":90617},{"name":"☆ main vc","msgs":24186},{"name":"☆ yap lab","msgs":21461},{"name":"☆ shameless pebbles farming","msgs":9710},{"name":"𓍢ִ໋🂺casino","msgs":9472}],"favouriteStickers":[{"name":"Tacos","count":1914,"url":"https://cdn.discordapp.com/stickers/1560976391929987233.png"}]},"stats":{"since":1792868400000,"until":1795535402000,"pebbles":{"totalEarned":840826,"topEarners":[{"id":"1158633440497909822","v":83639,"sources":{"message":31968,"drop":20775,"daily_claim":6600,"drop_streak":4330,"quest":3250,"voice":16116,"achievement":600}},{"id":"734444708922654750","v":69920,"sources":{"voice":55470,"message":5210,"daily_claim":6800,"drop":1930,"quest":490,"drop_streak":20}},{"id":"1452066807153295461","v":69293,"sources":{"voice":53031,"message":7112,"daily_claim":7200,"drop":620,"quest":1310,"drop_streak":20}},{"id":"1507436631198797854","v":67478,"sources":{"message":18912,"daily_claim":6650,"drop":2555,"quest":3590,"voice":29091,"drop_streak":80,"achievement":6600}},{"id":"1531401125826138173","v":51567,"sources":{"message":11846,"voice":22911,"daily_claim":6200,"drop_streak":1670,"drop":5640,"quest":3000,"achievement":300}}],"topSpenders":[{"id":"1158633440497909822","v":96600},{"id":"1507436631198797854","v":41250},{"id":"1311625931638571043","v":28800},{"id":"1357793223103484125","v":27100},{"id":"1076635120397713520","v":20250}],"totalSpent":283600},"milestones":{"levelUps":[{"id":"1158633440497909822","v":39},{"id":"1507436631198797854","v":36},{"id":"1452066807153295461","v":32},{"id":"734444708922654750","v":31},{"id":"1171171547524898937","v":30}],"rewardedInvites":[{"id":"1158633440497909822","v":2},{"id":"1507436631198797854","v":1},{"id":"800939279495725067","v":1}],"mostClaimed":[{"id":"1507436631198797854","v":12},{"id":"1171171547524898937","v":9},{"id":"1069581333694795828","v":8},{"id":"1531401125826138173","v":7},{"id":"459455078982483975","v":6}]},"giving":{"mostSent":[{"id":"734444708922654750","v":135700},{"id":"1452066807153295461","v":113862},{"id":"1158633440497909822","v":97210},{"id":"1171171547524898937","v":93653},{"id":"800939279495725067","v":63797}],"mostGifts":[{"id":"1107365174974894131","v":13},{"id":"1452066807153295461","v":13}],"topPairs":[{"a":"734444708922654750","b":"979406784076861520","pebbles":116500,"gifts":0},{"a":"1452066807153295461","b":"734444708922654750","pebbles":89567,"gifts":13},{"a":"1097921188765892719","b":"1171171547524898937","pebbles":83214,"gifts":0}],"totalSent":1040751,"totalGifts":26},"daily":{"longestStreak":[{"id":"1107365174974894131","v":32},{"id":"1069581333694795828","v":31},{"id":"1097921188765892719","v":31},{"id":"1109447484872347760","v":31},{"id":"1158633440497909822","v":31}],"claims":{"1107365174974894131":32,"1069581333694795828":31,"1097921188765892719":31,"1109447484872347760":31,"1158633440497909822":31}},"voice":{"top":[{"id":"734444708922654750","v":27668},{"id":"1452066807153295461","v":26044},{"id":"1507436631198797854","v":15296},{"id":"1531401125826138173","v":11740},{"id":"1109447484872347760","v":10218},{"id":"979406784076861520","v":10038},{"id":"1158633440497909822","v":8066},{"id":"1171171547524898937","v":7246}],"totalMinutes":153522,"people":42},"casino":{"rounds":10917,"wagered":4214325,"houseKept":183312,"mostRounds":[{"id":"1395868079971504314","v":4466,"fav":"mines"},{"id":"1164219423142465738","v":1460,"fav":"limbo"},{"id":"1158633440497909822","v":796,"fav":"mines"},{"id":"1069581333694795828","v":772,"fav":"limbo"},{"id":"1531401125826138173","v":751,"fav":"limbo"}],"highRollers":[{"id":"1395868079971504314","v":1957129},{"id":"1164219423142465738","v":641395},{"id":"1171171547524898937","v":339930}],"biggestWin":{"id":"1531401125826138173","profit":9500,"game":"limbo","bet":500},"luckiest":{"id":"1395868079971504314","z":1.0814524084824089,"hit":3227,"exp":3283.1411621272387},"unluckiest":{"id":"1158633440497909822","z":-1.5321051468801812,"hit":399,"exp":371.97573428892036},"bestNet":[{"id":"1164219423142465738","v":20887},{"id":"979406784076861520","v":3875},{"id":"1107365174974894131","v":1600}],"worstNet":[{"id":"1171171547524898937","v":-44176},{"id":"459455078982483975","v":-41824},{"id":"1395868079971504314","v":-20629}]},"drops":{"total":1833,"winners":[{"id":"1158633440497909822","v":456},{"id":"1531401125826138173","v":125},{"id":"1107365174974894131","v":117},{"id":"1389932173779533916","v":114},{"id":"704384670107959377","v":110}],"bestStreak":[{"id":"1357793223103484125","v":14},{"id":"1158633440497909822","v":12},{"id":"1531401125826138173","v":12}],"fastest":{"id":"1531401125826138173","ms":2134,"kind":"grab"},"people":41},"speedruns":[{"kind":"flag","id":"1389932173779533916","ms":23922}],"speedrunCount":62,"cards":{"packs":2012,"mostPacks":[{"id":"1158633440497909822","v":651},{"id":"1507436631198797854","v":285},{"id":"1311625931638571043","v":206},{"id":"1357793223103484125","v":190},{"id":"1076635120397713520","v":138}],"cards":4260,"mostCards":[{"id":"1158633440497909822","v":3086},{"id":"1109447484872347760","v":250},{"id":"800939279495725067","v":185}],"legendaries":[{"id":"1507436631198797854","v":30},{"id":"1311625931638571043","v":12},{"id":"1389932173779533916","v":9}],"specials":[],"comics":[{"id":"1158633440497909822","v":8}],"setsDone":[{"id":"1507436631198797854","v":22},{"id":"1389932173779533916","v":9},{"id":"1076635120397713520","v":4}],"totalSets":52,"firstCollection":{"id":"979406784076861520","at":1793473928505},"recyclers":[{"id":"767702872300847114","v":33},{"id":"1158633440497909822","v":20},{"id":"1389932173779533916","v":17}]},"rps":{"games":141,"topPair":{"a":"1069581333694795828","b":"1531401125826138173","games":21,"wins":{"1531401125826138173":18,"1069581333694795828":3},"draws":0},"hardestToBeat":{"id":"1531401125826138173","played":30,"won":25}},"ttt":{"games":106,"topPair":{"a":"1158633440497909822","b":"459455078982483975","games":12,"wins":{"1158633440497909822":1,"459455078982483975":11},"draws":0},"hardestToBeat":{"id":"459455078982483975","played":14,"won":11}},"heists":[],"heistHaul":[],"jail":{"top":[{"id":"1078039211413864518","v":253.88858333333334},{"id":"800939279495725067","v":138.698},{"id":"459455078982483975","v":98.76711666666667}],"sentences":23},"arabicFee":{"top":[{"id":"1107365174974894131","v":140},{"id":"1171171547524898937","v":14}],"total":154},"museum":0,"poker":{"tables":1,"biggestPot":{"id":"1097921188765892719","v":2500}}},"listener":{"id":"734444708922654750","hours":461.1333333333333,"msgs":3387,"ratio":7.344947231458725},"awards":{"minimumGenderReplies":30,"pickMe":[{"id":"459455078982483975","opposite":804,"known":872,"v":0.9220183486238532}],"socialButterfly":[{"id":"1158633440497909822","v":61},{"id":"1171171547524898937","v":59},{"id":"1078039211413864518","v":53},{"id":"1507436631198797854","v":51},{"id":"704384670107959377","v":51}],"brokenRecord":[{"id":"767702872300847114","count":66,"total":92,"v":0.717391304347826},{"id":"1520593720393732166","count":97,"total":219,"v":0.4429223744292237},{"id":"1226034313116516353","count":51,"total":119,"v":0.42857142857142855},{"id":"652562548641759252","count":13,"total":33,"v":0.3939393939393939},{"id":"780710735499493376","count":49,"total":126,"v":0.3888888888888889}],"reactionMagnet":[{"id":"767702872300847114","messages":693,"reactions":332,"v":0.4790764790764791},{"id":"241411206559039488","messages":165,"reactions":55,"v":0.3333333333333333},{"id":"1498447725434503269","messages":7231,"reactions":1984,"v":0.2743742220992947},{"id":"979406784076861520","messages":1230,"reactions":256,"v":0.208130081300813},{"id":"590997712699129866","messages":2076,"reactions":316,"v":0.15221579961464354}],"pingPong":[{"a":"1507436631198797854","b":"800939279495725067","v":598,"total":1280},{"a":"1357793223103484125","b":"1531401125826138173","v":569,"total":1246},{"a":"1158633440497909822","b":"800939279495725067","v":519,"total":1088},{"a":"1158633440497909822","b":"1171171547524898937","v":473,"total":1083},{"a":"1097921188765892719","b":"1158633440497909822","v":390,"total":853}],"pebbleWrittenNamesIncluded":true,"pebbleRegular":[{"id":"1531401125826138173","reply":666,"tag":65,"name":22,"v":753},{"id":"1078039211413864518","reply":407,"tag":25,"name":0,"v":432},{"id":"1507436631198797854","reply":329,"tag":25,"name":5,"v":359},{"id":"1357793223103484125","reply":262,"tag":23,"name":19,"v":304},{"id":"704384670107959377","reply":186,"tag":3,"name":23,"v":212}],"pebbleUnprompted":[{"id":"1158633440497909822","tags":13,"written":30,"v":43},{"id":"1078039211413864518","tags":13,"written":8,"v":21},{"id":"1109447484872347760","tags":14,"written":4,"v":18},{"id":"800939279495725067","tags":8,"written":7,"v":15},{"id":"1311625931638571043","tags":2,"written":8,"v":10},{"id":"1452066807153295461","tags":3,"written":7,"v":10},{"id":"1507436631198797854","tags":3,"written":6,"v":9},{"id":"704384670107959377","tags":4,"written":5,"v":9},{"id":"734444708922654750","tags":4,"written":4,"v":8},{"id":"1069581333694795828","tags":4,"written":3,"v":7},{"id":"1171171547524898937","tags":3,"written":3,"v":6},{"id":"1531401125826138173","tags":5,"written":1,"v":6},{"id":"1097921188765892719","tags":4,"written":1,"v":5},{"id":"1357793223103484125","tags":3,"written":2,"v":5},{"id":"1076635120397713520","tags":4,"written":0,"v":4},{"id":"1389932173779533916","tags":2,"written":2,"v":4},{"id":"459455078982483975","tags":4,"written":0,"v":4},{"id":"865135465014099978","tags":0,"written":4,"v":4},{"id":"1107365174974894131","tags":3,"written":0,"v":3},{"id":"1498447725434503269","tags":3,"written":0,"v":3},{"id":"773637936486285402","tags":3,"written":0,"v":3},{"id":"1395868079971504314","tags":2,"written":0,"v":2},{"id":"1557091816552276102","tags":2,"written":0,"v":2},{"id":"1164219423142465738","tags":1,"written":0,"v":1},{"id":"1217419914520821772","tags":0,"written":1,"v":1},{"id":"1257185526813823049","tags":1,"written":0,"v":1},{"id":"1393566139526676593","tags":1,"written":0,"v":1},{"id":"1520593720393732166","tags":1,"written":0,"v":1},{"id":"1545733147524734986","tags":1,"written":0,"v":1},{"id":"798280308071596063","tags":1,"written":0,"v":1},{"id":"963733383253471243","tags":1,"written":0,"v":1}]},"people":{"1158633440497909822":{"name":"✰𝒍𝒆𝒆𝒏𝒂✰","handle":"le3na_76","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1158633440497909822/avatars/b541accf60f89f2840831689af4a6fef.png?size=128","here":true},"1507436631198797854":{"name":"Haley","handle":"wleep_walker","avatar":"https://cdn.discordapp.com/avatars/1507436631198797854/b299be73fdee6476c03e0edbfad4e522.png?size=128","here":true},"800939279495725067":{"name":"sharoz","handle":"s2817.","avatar":"https://cdn.discordapp.com/avatars/800939279495725067/a04409652683a54fda3667c2941c549e.png?size=128","here":true},"1171171547524898937":{"name":"𝓡𝓸𝓴𝓪⭑","handle":"roka_y","avatar":"https://cdn.discordapp.com/avatars/1171171547524898937/be3e5e7b2526d0b87529cb17c09ad78e.png?size=128","here":true},"1531401125826138173":{"name":"Batata ma3 debth remmen","handle":"obsidian_sicario","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1531401125826138173/avatars/a_0a25c02283affc5bb261176f4cb320fd.png?size=128","here":true},"1097921188765892719":{"name":"m3z","handle":"am3zq","avatar":"https://cdn.discordapp.com/avatars/1097921188765892719/c7311db5cafc947642337622717ca077.png?size=128","here":true},"734444708922654750":{"name":"Aze","handle":"azelax","avatar":"https://cdn.discordapp.com/avatars/734444708922654750/b072c4240cb1685eff710aeefecbd334.png?size=128","here":true},"1452066807153295461":{"name":"Daddy jeon","handle":"jeon05679","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1452066807153295461/avatars/212a49f027ad31543dbdcd04a0f528ea.png?size=128","here":true},"1069581333694795828":{"name":"Hasnain Jaffery","handle":"abujee_","avatar":"https://cdn.discordapp.com/avatars/1069581333694795828/9fe1524b5c793bda136d9446fa0f1691.png?size=128","here":true},"1498447725434503269":{"name":"papa","handle":"abcabcdabcde","avatar":"https://cdn.discordapp.com/avatars/1498447725434503269/2e823b60a2a9f9cfd9f5bef0361f32ed.png?size=128","here":true},"1078039211413864518":{"name":"Tacos 🌮","handle":"asesino3199","avatar":"https://cdn.discordapp.com/avatars/1078039211413864518/1fd4aa82ecffae3ef8264ead2ee84ccb.png?size=128","here":true},"704384670107959377":{"name":"Sugar booger pineapply cusymusy","handle":"casper_71","avatar":"https://cdn.discordapp.com/avatars/704384670107959377/9d9ea2eb8d486fa34347915eb9789998.png?size=128","here":true},"1357793223103484125":{"name":"Zaytoona","handle":"volimacke","avatar":"https://cdn.discordapp.com/avatars/1357793223103484125/76d578ea5b875f93ab322518d99917e0.png?size=128","here":true},"1311625931638571043":{"name":"George👻","handle":"vm3y","avatar":"https://cdn.discordapp.com/avatars/1311625931638571043/77ec6abc6905d792845ff85b915e0b54.png?size=128","here":true},"1076635120397713520":{"name":"𝓟𝓻𝓮𝓼𝓱𝔂𝔃","handle":"hln_05","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/1076635120397713520/avatars/a_6625926144a52a9571e62ff172783507.png?size=128","here":true},"1107365174974894131":{"name":"-Flash","handle":"i_hate_edaters7007","avatar":"https://cdn.discordapp.com/avatars/1107365174974894131/cc1a0cd08ebc0fb352a9cefacb417fba.png?size=128","here":true},"979406784076861520":{"name":"Mattyess","handle":"shintoron","avatar":"https://cdn.discordapp.com/avatars/979406784076861520/ca8a3230ad97c4dd622999b7ac39098d.png?size=128","here":true},"1109447484872347760":{"name":"Harami Aurora","handle":"ftaur_ora","avatar":"https://cdn.discordapp.com/avatars/1109447484872347760/f4a564e01734e607acd1a0b4eb128f55.png?size=128","here":true},"1395868079971504314":{"name":"Anna","handle":"annabellederich","avatar":"https://cdn.discordapp.com/avatars/1395868079971504314/c81860633dd248e76f8369390c95b915.png?size=128","here":true},"1164219423142465738":{"name":"᥅ꪖᦓᦓꪗ~","handle":"rassy_211_","avatar":"https://cdn.discordapp.com/avatars/1164219423142465738/82b81f0ba70f6e9bda042da564cbf56c.png?size=128","here":true},"459455078982483975":{"name":"Chubnabiii","handle":".rajaal","avatar":"https://cdn.discordapp.com/avatars/459455078982483975/ba1f2be4d174fedcab5f2dacf20a322f.png?size=128","here":true},"1389932173779533916":{"name":"vivii","handle":"vroomm7","avatar":"https://cdn.discordapp.com/avatars/1389932173779533916/5ba556019622c4167fe30645fa9dfc90.png?size=128","here":true},"767702872300847114":{"name":"pearl","handle":"pearl__1158","avatar":"https://cdn.discordapp.com/avatars/767702872300847114/ea016793ada11b01fe811570dd0aca37.png?size=128","here":true},"1520593720393732166":{"name":"Lucifer","handle":"angel1cal","avatar":"https://cdn.discordapp.com/avatars/1520593720393732166/4fbcd344651e93fcca63f5f63122ed20.png?size=128","here":true},"1226034313116516353":{"name":"tired","handle":"full_pipeline","avatar":"https://cdn.discordapp.com/avatars/1226034313116516353/afcefce51a8634b55fa7f4114a18f755.png?size=128","here":false},"652562548641759252":{"name":"Krissy","handle":"mommychuuya","avatar":"https://cdn.discordapp.com/guilds/1183416128647745568/users/652562548641759252/avatars/7ade1114d2a6a9877a07fcb7943f1765.png?size=128","here":true},"780710735499493376":{"name":"pewpew🔫","handle":"jaw.fish.","avatar":"https://cdn.discordapp.com/avatars/780710735499493376/785e695b2e6eaaef3f4659fb8acb9178.png?size=128","here":true},"241411206559039488":{"name":"Lemmy","handle":"lemmy0","avatar":"https://cdn.discordapp.com/avatars/241411206559039488/4ee2ba30db5804ccde1a467ff4a1b9e1.png?size=128","here":false},"590997712699129866":{"name":"ensho","handle":"enshooo","avatar":"https://cdn.discordapp.com/avatars/590997712699129866/e27a7d303e1088b278fde6de2e06960e.png?size=128","here":false},"865135465014099978":{"name":"Sherry","handle":"baiht_32","avatar":"https://cdn.discordapp.com/avatars/865135465014099978/bb50f6b11afa78a9b6ffbde4675852f6.png?size=128","here":true},"773637936486285402":{"name":"Venom","handle":"capitan0404","avatar":"https://cdn.discordapp.com/avatars/773637936486285402/2af1a58c7ee2e2b5336115873906536c.png?size=128","here":false},"1557091816552276102":{"name":"Hummus popeye🚬","handle":"z.yaban","avatar":"https://cdn.discordapp.com/avatars/1557091816552276102/ea1ee2bd2702641a1c01d183b7de54aa.png?size=128","here":true},"1217419914520821772":{"name":"Adelulu","handle":"adamskaa","avatar":"https://cdn.discordapp.com/avatars/1217419914520821772/89af7d3c3ab65c23933f513c3ad3e5c6.png?size=128","here":true},"1257185526813823049":{"name":"poetryifitwasaman","handle":"poetryifitwasaman","avatar":"https://cdn.discordapp.com/avatars/1257185526813823049/322d836b5348a2c7ae7e3a18dff46f17.png?size=128","here":false},"1393566139526676593":{"name":"Lafloofi","handle":"ethereal.mogger","avatar":"https://cdn.discordapp.com/avatars/1393566139526676593/d2c7a5bdc0ababc4e4b000e15f261618.png?size=128","here":true},"1545733147524734986":{"name":"farah","handle":"farahshideout","avatar":"https://cdn.discordapp.com/avatars/1545733147524734986/fb74f59f6e6747c1c11e0d6942b0ffb5.png?size=128","here":true},"798280308071596063":{"name":"Neglo","handle":"neglawy","avatar":"https://cdn.discordapp.com/avatars/798280308071596063/0add07240359d9950c1dfc65a9920741.png?size=128","here":true},"963733383253471243":{"name":"Shibby","handle":"kibas_bahihs","avatar":"https://cdn.discordapp.com/avatars/963733383253471243/118e651c841f9c62471d0c74b9e82c44.png?size=128","here":true}}};
 const S = W.stats;
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -123,9 +154,11 @@ const P = (id) => {
   return NAME_OVERRIDES[id] ? { ...p, name: NAME_OVERRIDES[id] } : p;
 };
 const hrs = (min) => fmt(min / 60);
-const day = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const day = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: W.window.timeZone ?? 'UTC' });
+const cutoffTime = new Intl.DateTimeFormat('en-GB', { hour: 'numeric', minute: '2-digit', timeZone: W.window.timeZone ?? 'UTC' });
+const lastDay = day(W.window.to - (W.window.timeZone ? 1 : 0));
 const plural = (n, one, many = one + 's') => `${fmt(n)} ${n === 1 ? one : many}`;
-const GAME = { mines: 'Mines', hilo: 'Higher or Lower', blackjack: 'Blackjack', roulette: 'Roulette', slots: 'Slots' };
+const GAME = { mines: 'Mines', hilo: 'Higher or Lower', blackjack: 'Blackjack', roulette: 'Roulette', slots: 'Slots', limbo: 'Limbo' };
 const KIND = { flag: 'Flags', capital: 'Capitals', sequence: 'Sequences', math: 'Math', scramble: 'Scramble', trivia: 'Trivia', grab: 'Grab' };
 
 function av(id, sm = false) {
@@ -137,9 +170,9 @@ function av(id, sm = false) {
 }
 const who = (id) => `<div class="who"><span class="name">${esc(P(id).name)}</span>${P(id).handle ? `<span class="handle">@${esc(P(id).handle)}</span>` : ''}</div>`;
 const runners = (list, val, from = 1) => (list.length > from
-  ? `<ol class="runners">${list.slice(from).map((x, i) => `<li><span class="rk">${i + from + 1}</span>${av(x.id, true)}<span class="nm">${esc(P(x.id).name)}</span><span class="v">${val(x)}</span></li>`).join('')}</ol>` : '');
+  ? `<ol class="runners">${list.slice(from, 5).map((x, i) => `<li><span class="rk">${i + from + 1}</span>${av(x.id, true)}<span class="nm">${esc(P(x.id).name)}</span><span class="v">${val(x)}</span></li>`).join('')}</ol>` : '');
 const pairRunners = (list, val, from = 1) => (list.length > from
-  ? `<ol class="runners">${list.slice(from).map((x, i) => `<li class="pair"><span class="rk">${i + from + 1}</span><span class="duo">${av(x.a, true)}${av(x.b, true)}</span><span class="nm">${esc(P(x.a).name)} & ${esc(P(x.b).name)}</span><span class="v">${val(x)}</span></li>`).join('')}</ol>` : '');
+  ? `<ol class="runners">${list.slice(from, 5).map((x, i) => `<li class="pair"><span class="rk">${i + from + 1}</span><span class="duo">${av(x.a, true)}${av(x.b, true)}</span><span class="nm">${esc(P(x.a).name)} & ${esc(P(x.b).name)}</span><span class="v">${val(x)}</span></li>`).join('')}</ol>` : '');
 
 /** One award: who won, what for, and the runners-up. */
 function award(label, list, stat, val, extra = '', wide = false) {
@@ -172,7 +205,8 @@ const vTotal = S.voice.totalMinutes;
 let html = '';
 
 /* ---- intro ---- */
-html += `<section class="band c-intro"><div class="inner"><span class="kicker">The Secret Lair · ${day(W.window.from)} – ${day(W.window.to)}</span>
+html += `<section class="band c-intro"><div class="inner"><span class="kicker">The Secret Lair · ${day(W.window.from)} – ${lastDay}</span>
+  ${W.window.provisional ? `<p class="note">Preview through ${cutoffTime.format(W.window.to)} Pakistan time on ${lastDay}.</p>` : ''}
   <h1>The Lair,<br>Wrapped.</h1><p class="lead">Everything since ${day(W.window.from)}: who talked the most, who got tagged the most, who basically lived in VC, and everything Pebble saw along the way.</p>
   ${bigs([[fmt(C.total), 'messages sent'], [hrs(vTotal), 'hours in voice chat'], [fmt(S.pebbles.totalEarned), 'pebbles earned'], [fmt(S.casino.rounds), 'casino rounds played'], [fmt(S.drops.total), 'drops dropped'], [fmt(S.cards.packs), 'card packs opened']])}
 </div></section>`;
@@ -192,7 +226,26 @@ html += band('chat', 'c-chat', 'Chapter 1', 'The chat', `${fmt(C.people)} people
   ${award('Picture person', C.images, (w) => `<b>${fmt(w.v)}</b> pictures posted.`, (x) => fmt(x.v))}
   ${award('Emoji fiend', C.emojiFiend, (w) => `<b>${fmt(w.v)}</b> emoji used${w.fav ? `, mostly ${w.fav.url ? `<img src="${esc(w.fav.url)}" alt=":${esc(w.fav.name)}:" style="width:22px;height:22px;vertical-align:-5px">` : esc(w.fav.char)}` : ''}.`, (x) => fmt(x.v))}
   ${C.emoji.length ? `<article class="award wide"><span class="label">The server's favourite emoji</span><div class="emoji">${C.emoji.map((e) => `<div>${e.url ? `<img src="${esc(e.url)}" alt=":${esc(e.name)}:" loading="lazy">` : `<span class="e">${esc(e.char)}</span>`}<span class="c">${fmt(e.v)}</span></div>`).join('')}</div><p class="note">${fmt(C.totalEmoji)} emoji in all.</p></article>` : ''}
+  ${C.favouriteStickers?.length ? `<article class="award wide"><span class="label">The server’s favourite sticker</span><div class="grid">${C.favouriteStickers.map((sticker) => `<div>${sticker.url ? `<img src="${esc(sticker.url)}" alt="" width="96" height="96" style="object-fit:contain" loading="lazy">` : ''}<p class="stat"><b>${esc(sticker.name)}</b> · sent ${plural(sticker.count, 'time')}</p></div>`).join('')}</div></article>` : ''}
   </div>`);
+
+/* ---- bonus awards ---- */
+const A = W.awards;
+if (A) {
+  const pct = (v) => `${(v * 100).toFixed(1)}%`;
+  html += band('bonus', 'c-rivals', 'Bonus awards', 'Lair superlatives', '',
+    `<div class="grid">
+    ${award('Biggest pick me', A.pickMe, (w) => `<b>${pct(w.v)}</b> of qualifying replies went to members with the opposite role (${fmt(w.opposite)} of ${fmt(w.known)}).<br><small>Based on current Discord roles, with at least ${A.minimumGenderReplies} replies between members with exactly one of the two roles.</small>`, (x) => pct(x.v))}
+    ${award('Social butterfly', A.socialButterfly, (w) => `Replied to <b>${fmt(w.v)}</b> different people.`, (x) => fmt(x.v))}
+    ${award('Broken record', A.brokenRecord, (w) => `Sent <b>${pct(w.v)}</b> of their replies to one person (${fmt(w.count)} of ${fmt(w.total)}).`, (x) => pct(x.v))}
+    ${award('Reaction magnet', A.reactionMagnet, (w) => `Averaged <b>${w.v.toFixed(2)}</b> reactions per message across ${fmt(w.messages)} messages.`, (x) => x.v.toFixed(2))}
+    ${award('Pebble’s regular', A.pebbleRegular, (w) => `Addressed Pebble <b>${fmt(w.v)}</b> times: ${fmt(w.reply)} replies, ${fmt(w.tag)} tags, and ${fmt(w.name)} calls by name.<br><small>Replies use plain messages from Pebble as a proxy for AI chat.</small>`, (x) => fmt(x.v))}
+    ${award('Pebble brought you up', A.pebbleUnprompted?.slice(0, 5), (w) => A.pebbleWrittenNamesIncluded
+      ? `Mentioned in <b>${plural(w.v, 'likely Pebble pop-in')}</b>: ${fmt(w.tags)} tags and ${fmt(w.written)} written-name-only mentions.<br><small>Estimated from standalone messages in the current pop-in channels. Recognizable names and tags count once per person per message.</small>`
+      : `Got <b>${plural(w.v, 'ping')}</b> in likely Pebble pop-ins.<br><small>Estimated from standalone messages in the current pop-in channels. Counts explicit @mentions.</small>`, (x) => fmt(x.v))}
+    ${pairAward('Ping-pong champions', A.pingPong, (w) => `Each sent the other at least <b>${fmt(w.v)}</b> replies, for ${fmt(w.total)} replies between them.`, (x) => fmt(x.v))}
+    </div>`);
+}
 
 /* ---- voice ---- */
 const L = W.listener;
@@ -216,6 +269,9 @@ html += band('pebbles', 'c-pebbles', 'Chapter 3', 'Pebbles', `The server earned 
   ${award('Most generous', S.giving.mostSent, (w) => `Sent <b>${fmt(w.v)}</b> pebbles to other people.`, (x) => fmt(x.v))}
   ${gp.length ? pairAward('Sharing is caring', gp.map((p) => ({ ...p, v: p.pebbles })), (w) => `<b>${fmt(w.pebbles)}</b> pebbles${w.gifts ? ` and ${plural(w.gifts, 'gift')}` : ''} passed between them.`, (x) => fmt(x.pebbles)) : ''}
   ${award('Gift giver', S.giving.mostGifts, (w) => `Gave away <b>${plural(w.v, 'gift')}</b> from the shop.`, (x) => fmt(x.v))}
+  ${award('Milestone champion', S.milestones?.mostClaimed, (w) => `Claimed <b>${plural(w.v, 'milestone tier')}</b> in <code>p ms</code> through the recap cutoff.`, (x) => fmt(x.v))}
+  ${award('Level climber', S.milestones?.levelUps, (w) => `Leveled up <b>${fmt(w.v)}</b> times.`, (x) => fmt(x.v))}
+  ${award('Lair recruiter', S.milestones?.rewardedInvites, (w) => `Earned rewards for <b>${plural(w.v, 'invite')}</b>.`, (x) => fmt(x.v))}
   ${award('Never misses a daily', S.daily.longestStreak, (w) => `Claimed the daily bonus <b>${w.v} days</b> in a row.`, (x) => `${x.v} days`)}
   </div>`);
 
@@ -250,10 +306,8 @@ html += band('cards', 'c-cards', 'Chapter 6', 'Cards', `${fmt(CD.packs)} packs o
   ${award('Collector', CD.mostCards, (w) => `Pulled <b>${fmt(w.v)}</b> cards.`, (x) => fmt(x.v))}
   ${award('Legendary luck', CD.legendaries, (w) => `<b>${plural(w.v, 'legendary', 'legendaries')}</b> pulled.`, (x) => fmt(x.v))}
   ${award('One of one', CD.specials, (w) => `Pulled <b>${plural(w.v, 'special card')}</b>, the 1-of-1 prints.`, (x) => fmt(x.v))}
-  ${award('Comic hunter', CD.comics, (w) => `Found <b>${plural(w.v, 'comic page')}</b>.`, (x) => fmt(x.v))}
   ${award('Set finisher', CD.setsDone, (w) => `Completed <b>${plural(w.v, 'set')}</b>.`, (x) => fmt(x.v))}
-  ${CD.firstCollection ? award('First to collect them all', [{ id: CD.firstCollection.id }], () => `Finished the whole collection first, on ${day(CD.firstCollection.at)}.`, () => '') : ''}
-  ${award('Recycler', CD.recyclers, (w) => `Recycled spare cards <b>${plural(w.v, 'time')}</b>.`, (x) => fmt(x.v))}
+  ${CD.firstCollection ? award('First to collect them all', [{ id: CD.firstCollection.id }], () => `First to finish the whole collection in this edition, on ${day(CD.firstCollection.at)}.`, () => '') : ''}
   </div>`);
 
 /* ---- rivalries ---- */
@@ -280,11 +334,109 @@ html += band('chaos', 'c-chaos', 'Chapter 8', 'Chaos', `Heists, jail time, and t
   </div>`);
 
 /* ---- outro ---- */
-html += `<section class="band c-outro"><div class="inner"><span class="kicker">That's a wrap</span><h2>Same time next year?</h2>
+html += `<section class="band c-outro"><div class="inner"><span class="kicker">That's a wrap</span><h2>${W.awards ? "See you next month?" : "Same time next year?"}</h2>
   <p class="lead">Every number here comes from the server itself: the chat history, and everything Pebble keeps track of.</p></div></section>`;
 
-document.getElementById('app').innerHTML = html;
-document.getElementById('foot').innerHTML = `<p>The Secret Lair, ${day(W.window.from)} to ${day(W.window.to)}. Chat counts come from the message history of every channel Pebble can read; bots are left out. Voice hours come from Pebble's voice pay, so time spent alone in a call, or deafened, doesn't count. Pebbles, casino, drops, cards and games come from Pebble's own records.</p><p>Made by Pebble.</p>`;
+const source = document.createElement('template');
+source.innerHTML = html;
+const intro = source.content.querySelector('.c-intro');
+const outro = source.content.querySelector('.c-outro');
+const slides = [{ theme: 'c-intro', opening: intro }];
+const chapters = [{ name: 'Start', index: 0 }];
+for (const section of source.content.querySelectorAll('section[id]')) {
+  const cards = section.querySelectorAll('article.award');
+  if (!cards.length) continue;
+  const chapter = section.querySelector('h2').textContent;
+  chapters.push({ name: chapter, index: slides.length });
+  const theme = [...section.classList].find((name) => name.startsWith('c-'));
+  for (const card of cards) slides.push({ theme, chapter, title: card.querySelector('.label').textContent, card });
+}
+chapters.push({ name: 'Wrap-up', index: slides.length });
+slides.push({ theme: 'c-outro', closing: outro });
+
+const stage = document.getElementById('stage');
+const chapterSelect = document.getElementById('chapter');
+const nextButton = document.getElementById('next');
+const backButton = document.getElementById('back');
+const progress = document.getElementById('progress');
+const position = document.getElementById('position');
+for (const chapter of chapters) chapterSelect.add(new Option(chapter.name, chapter.index));
+progress.max = slides.length;
+let current = 0;
+let places = [];
+let revealedCount = 0;
+
+function show(index, focus = true) {
+  current = Math.max(0, Math.min(index, slides.length - 1));
+  revealedCount = 0;
+  const slide = slides[current];
+  const runnerList = slide.card?.querySelector('.runners');
+  places = runnerList ? [...runnerList.children].filter((row) => /^\d+$/.test(row.querySelector('.rk')?.textContent ?? '')).reverse() : [];
+  stage.className = `story-stage band ${slide.theme}`;
+  const copy = slide.card
+    ? `<span class="kicker">${esc(slide.chapter)}</span><h2>${esc(slide.title)}</h2>`
+    : [...(slide.opening ?? slide.closing).querySelector('.inner').children]
+      .filter((item) => !item.matches('.big')).map((item) => item.outerHTML).join('');
+  const panel = slide.card
+    ? `<button type="button" class="story-cover"><span class="question" aria-hidden="true">?</span><span>${places.length ? `Reveal #${places.length + 1}` : 'Reveal result'}</span></button>`
+    : slide.closing ? intro.querySelector('.big').outerHTML
+      : '<button type="button" class="story-cover"><span class="question" aria-hidden="true">✦</span><span>Start story</span></button>';
+  stage.innerHTML = `<div class="story-layout"><div class="story-copy">${copy}</div><div class="story-panel">${panel}</div></div>`;
+  const heading = stage.querySelector('h1, h2');
+  heading.tabIndex = -1;
+  if (focus) heading.focus({ preventScroll: true });
+  stage.querySelector('.story-cover')?.addEventListener('click', next);
+  chapterSelect.value = chapters.findLast((chapter) => chapter.index <= current).index;
+  position.textContent = `${current + 1} / ${slides.length}`;
+  progress.value = current + (slide.card ? .5 : 1);
+  backButton.disabled = current === 0;
+  nextButton.textContent = slide.card
+    ? (places.length ? `Reveal #${places.length + 1}` : 'Reveal')
+    : slide.closing ? 'Replay ↻' : 'Start →';
+}
+
+function reveal() {
+  const slide = slides[current];
+  const panel = stage.querySelector('.story-panel');
+  revealedCount++;
+  if (revealedCount <= places.length) {
+    const card = document.createElement('article');
+    card.className = 'award story-reveal';
+    const title = document.createElement('h3');
+    title.textContent = `#${places.length + 2 - revealedCount}`;
+    const board = document.createElement('ol');
+    board.className = 'runners';
+    board.append(...places.slice(0, revealedCount).reverse().map((row) => row.cloneNode(true)));
+    card.append(title, board);
+    panel.replaceChildren(card);
+    card.tabIndex = -1;
+    card.focus({ preventScroll: true });
+    nextButton.textContent = `Reveal #${places.length + 1 - revealedCount}`;
+    progress.value = current + .5 + .5 * revealedCount / (places.length + 1);
+    return;
+  }
+  const card = slide.card.cloneNode(true);
+  card.classList.add('story-reveal');
+  card.tabIndex = -1;
+  panel.replaceChildren(card);
+  card.focus({ preventScroll: true });
+  progress.value = current + 1;
+  nextButton.textContent = 'Next →';
+}
+
+function next() {
+  if (slides[current].card && revealedCount <= places.length) reveal();
+  else show(current === slides.length - 1 ? 0 : current + 1);
+}
+nextButton.addEventListener('click', next);
+backButton.addEventListener('click', () => show(current - 1));
+chapterSelect.addEventListener('change', () => show(Number(chapterSelect.value)));
+document.addEventListener('keydown', (event) => {
+  if (event.target.matches('select, input, textarea') || event.altKey || event.metaKey || event.ctrlKey) return;
+  if (event.key === 'ArrowRight') { event.preventDefault(); next(); }
+  if (event.key === 'ArrowLeft') { event.preventDefault(); if (current > 0) show(current - 1); }
+});
+show(0, false);
 </script>
 </body>
 </html>
