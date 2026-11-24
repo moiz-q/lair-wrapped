@@ -105,12 +105,11 @@ button:disabled { opacity: .4; }
 .story-cover::after { transform: translate(-50%, -50%) scale(1.65); opacity: .1; }
 .story-cover:hover { border-color: var(--hot); }
 .story-cover .question { font: 900 clamp(90px, 14vw, 180px)/1 var(--display); color: var(--hot); text-shadow: 0 0 55px color-mix(in oklab, var(--hot) 50%, transparent); }
-.category-guide { display: grid; gap: 8px; }
-.category-guide details { background: var(--card); border: 1px solid var(--card-line); border-radius: 12px; padding: 10px 14px; }
-.category-guide summary { cursor: pointer; font-weight: 700; }
-.category-guide dl { margin: 10px 0 0; }
-.category-guide dt { color: var(--ink); font-weight: 700; }
-.category-guide dd { color: var(--ink-2); margin: 0 0 10px; }
+.story-stage.results-stage { align-content: start; }
+.results-layout { padding: clamp(22px, 5vw, 74px); position: relative; display: grid; gap: 36px; min-width: 0; }
+.results-section { display: grid; gap: 16px; }
+.results-section h3 { color: var(--hot); font-size: clamp(20px, 3vw, 32px); }
+.results-layout .award .label { display: inline; }
 .story-reveal { animation: reveal-in .45s ease-out both; }
 @keyframes reveal-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
 @media (min-width: 840px) {
@@ -343,71 +342,13 @@ html += band('chaos', 'c-chaos', 'Chapter 8', 'Chaos', `Heists, jail time, and t
 html += `<section class="band c-outro"><div class="inner"><span class="kicker">That's a wrap</span><h2>${W.awards ? "See you next month?" : "Same time next year?"}</h2>
   <p class="lead">Every number here comes from the server itself: the chat history, and everything Pebble keeps track of.</p></div></section>`;
 
-const definitions = {
-  'Most messages': 'Who sent the most messages.',
-  'Most tagged': 'Who received the most direct tags. Automatic reply pings are excluded.',
-  'The tagger': 'Who tagged other members the most.',
-  'The duo': 'The pair with the most tags and direct replies between them, combined.',
-  'Always talking': 'The pair with the most back-to-back messages in the same channel within two minutes.',
-  'Most replied to': 'Whose messages received the most direct Discord replies.',
-  'Crowd favourite': 'Whose messages received the most reactions in total.',
-  'GIF lord': 'Who sent the most GIFs.',
-  'Picture person': 'Who posted the most image attachments, excluding GIFs.',
-  'Emoji fiend': 'Who used the most emoji in messages, plus their most-used emoji.',
-  "The server's favourite emoji": 'Which emoji were used most often in messages across the server.',
-  'The server’s favourite sticker': 'Which Discord sticker was sent most often across the server.',
-  'Biggest pick me': 'The five members with the highest share of qualifying replies to someone with the opposite Discord gender role. Both members must have exactly one of the two roles. A sender needs at least 30 qualifying replies.',
-  'Social butterfly': 'Who directly replied to the most different members.',
-  'Broken record': 'Who sent the highest share of their direct replies to one person, among members who sent at least 30 replies.',
-  'Reaction magnet': 'Who averaged the most reactions per message, among members who sent at least 100 messages.',
-  'Pebble’s regular': 'Who addressed Pebble most often through direct replies, tags, or calls by name.',
-  'Pebble brought you up': 'Who Pebble mentioned in the most likely unprompted pop-ins. Written names and tags both count once per person per message. Discord history gives us an estimate of which posts were pop-ins.',
-  'Ping-pong champions': 'The pair with the most balanced volume of direct replies. The score uses the smaller of the two reply counts, with at least 20 replies from each member.',
-  'Lived in VC': 'Who logged the most eligible voice time according to Pebble’s voice payouts.',
-  'The quiet listener': 'Who sent the fewest messages per hour in voice chat, among members with at least 50 eligible voice hours.',
-  'Top earner': 'Who earned the most Pebbles from tracked rewards such as chat, voice, drops, and quests.',
-  'Big spender': 'Who spent the most on shop purchases, including card packs.',
-  'Most generous': 'Who transferred the most Pebbles to other members.',
-  'Sharing is caring': 'The pair who exchanged the most value, counting Pebble transfers and adding 150 per shop gift.',
-  'Gift giver': 'Who sent the most shop gifts.',
-  'Milestone champion': 'Who had claimed the most p ms milestone tiers by the recap cutoff.',
-  'Level climber': 'Who leveled up the most times during the recap period.',
-  'Lair recruiter': 'Who earned the most invite rewards during the recap period.',
-  'Never misses a daily': 'Who logged the longest streak of daily bonus claims on consecutive UTC dates.',
-  'Regular': 'Who played the most casino rounds, plus their most-played game.',
-  'High roller': 'Who wagered the most Pebbles.',
-  'Biggest single win': 'Who made the most profit on one casino round.',
-  'Beat the house': 'Who finished furthest ahead after subtracting their bets from their payouts.',
-  'The house thanks you': 'Who finished furthest behind after subtracting their bets from their payouts.',
-  'Luckiest at Mines': 'Who hit fewer mines than expected by the widest margin relative to risk, among players with at least 50 picks.',
-  'Unluckiest at Mines': 'Who hit more mines than expected by the widest margin relative to risk, among players with at least 50 picks.',
-  'Drop champion': 'Who won the most drops.',
-  'On a roll': 'Who recorded the longest drop-win streak.',
-  'Fastest fingers': 'Who won a drop in the shortest time after it appeared.',
-  'Speedrun records': 'The fastest perfect run in each speedrun category.',
-  'Pack addict': 'Who opened the most card packs.',
-  'Collector': 'Who acquired the most cards, excluding grants.',
-  'Legendary luck': 'Who acquired the most legendary cards, excluding grants.',
-  'One of one': 'Who acquired the most special 1-of-1 prints, excluding grants.',
-  'Set finisher': 'Who completed the most individual member card sets.',
-  'First to collect them all': 'Who first completed the full collection during the recap period.',
-  'Rock paper scissors rivals': 'The pair who played each other the most in RPS, with their head-to-head record.',
-  'Tic tac toe rivals': 'The pair who played each other the most in tic tac toe, with their head-to-head record.',
-  'Hardest to beat': 'Who had the highest RPS win rate among members who played at least 10 games.',
-  'They robbed the vault': 'The crew who escaped in a real heist and the total haul.',
-  'Caught red-handed': 'A crew caught during a real heist and where their alarm ended up.',
-  'Most time in jail': 'Who spent the most time in Pebble jail on sentences that began during the period.',
-  'Fined for Arabic': 'Who paid the most Pebbles in Arabic-letter fees.',
-  'Biggest poker pot': 'Who received the largest single poker payout.',
-};
-
 const source = document.createElement('template');
 source.innerHTML = html;
 const intro = source.content.querySelector('.c-intro');
 const outro = source.content.querySelector('.c-outro');
 const slides = [{ theme: 'c-intro', opening: intro }];
 const chapters = [{ name: 'Start', index: 0 }];
-const guide = new Map();
+const results = [];
 for (const section of source.content.querySelectorAll('section[id]')) {
   const cards = section.querySelectorAll('article.award');
   if (!cards.length) continue;
@@ -417,19 +358,19 @@ for (const section of source.content.querySelectorAll('section[id]')) {
   for (const card of cards) {
     const title = card.querySelector('.label').textContent;
     slides.push({ theme, chapter, title, card });
-    if (definitions[title]) {
-      if (!guide.has(chapter)) guide.set(chapter, new Set());
-      guide.get(chapter).add(title);
-    }
   }
+  results.push({ chapter, theme, cards });
 }
 chapters.push({ name: 'Wrap-up', index: slides.length });
 slides.push({ theme: 'c-outro', closing: outro });
-chapters.push({ name: 'Category guide', index: slides.length });
-slides.push({ theme: 'c-outro', guide: true });
-const guidePanel = `<div class="category-guide">${[...guide].map(([chapter, titles]) =>
-  `<details><summary>${esc(chapter)}</summary><dl>${[...titles].map((title) =>
-    `<dt>${esc(title)}</dt><dd>${esc(definitions[title])}</dd>`).join('')}</dl></details>`).join('')}</div>`;
+chapters.push({ name: 'All results', index: slides.length });
+slides.push({ theme: 'c-outro', results: true });
+const resultsPage = () => `<div class="results-layout">
+  <div class="story-copy"><h2>All results</h2><p class="lead">Every award from this edition, by chapter.</p></div>
+  ${results.map(({ chapter, theme, cards }) => `<section class="results-section ${theme}">
+    <h3>${esc(chapter)}</h3><div class="grid">${[...cards].map((card) => card.outerHTML).join('')}</div>
+  </section>`).join('')}
+</div>`;
 
 const stage = document.getElementById('stage');
 const chapterSelect = document.getElementById('chapter');
@@ -449,21 +390,24 @@ function show(index, focus = true) {
   const slide = slides[current];
   const runnerList = slide.card?.querySelector('.runners');
   places = runnerList ? [...runnerList.children].filter((row) => /^\d+$/.test(row.querySelector('.rk')?.textContent ?? '')).reverse() : [];
-  stage.className = `story-stage band ${slide.theme}`;
+  stage.className = `story-stage band ${slide.theme}${slide.results ? ' results-stage' : ''}`;
   const copy = slide.card
     ? `<span class="kicker">${esc(slide.chapter)}</span><h2>${esc(slide.title)}</h2>`
-    : slide.guide ? '<h2>Category guide</h2><p class="lead">Open a chapter to see what each award measures.</p>'
+    : slide.results ? ''
     : [...(slide.opening ?? slide.closing).querySelector('.inner').children]
       .filter((item) => !item.matches('.big')).map((item) => item.outerHTML).join('');
   const panel = slide.card
     ? `<button type="button" class="story-cover"><span class="question" aria-hidden="true">?</span><span>${places.length ? `Reveal #${places.length + 1}` : 'Reveal result'}</span></button>`
-    : slide.guide ? guidePanel
+    : slide.results ? ''
     : slide.closing ? intro.querySelector('.big').outerHTML
       : '<button type="button" class="story-cover"><span class="question" aria-hidden="true">✦</span><span>Start story</span></button>';
-  stage.innerHTML = `<div class="story-layout"><div class="story-copy">${copy}</div><div class="story-panel">${panel}</div></div>`;
+  stage.innerHTML = slide.results ? resultsPage() : `<div class="story-layout"><div class="story-copy">${copy}</div><div class="story-panel">${panel}</div></div>`;
   const heading = stage.querySelector('h1, h2');
   heading.tabIndex = -1;
-  if (focus) heading.focus({ preventScroll: true });
+  if (focus) {
+    heading.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }
   stage.querySelector('.story-cover')?.addEventListener('click', next);
   chapterSelect.value = chapters.findLast((chapter) => chapter.index <= current).index;
   position.textContent = `${current + 1} / ${slides.length}`;
@@ -471,7 +415,7 @@ function show(index, focus = true) {
   backButton.disabled = current === 0;
   nextButton.textContent = slide.card
     ? (places.length ? `Reveal #${places.length + 1}` : 'Reveal')
-    : slide.guide ? 'Replay ↻' : slide.closing ? 'Category guide →' : 'Start →';
+    : slide.results ? 'Replay ↻' : slide.closing ? 'All results →' : 'Start →';
 }
 
 function reveal() {
